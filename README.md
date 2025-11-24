@@ -32,11 +32,13 @@ Gigmaster separates raw content from application logic.
 ```text
 gigmaster/
 ├── lyrics/                 # 📂 YOUR CONTENT
-│   ├── demo-Song.txt      # Song lyrics
+│   ├── demo-Song.txt       # Song lyrics
 │   └── properties/         # ⚙️ METADATA
 │       └── demo-Song.yaml # Title, Artist, BPM, Key
 ├── backend/                # Node.js Express Server
 └── frontend/               # Vue 3 + Vite App
+├── Dockerfile              # builds the container
+└── docker-compose.yml      # runs the container
 ```
 
 ---
@@ -80,6 +82,12 @@ You can add songs via the **"Add Song"** button in the UI, or manually by creati
     bpm: 120
     genre: Rock
     ```
+
+---
+
+## 📦 Contributing
+
+Feel free to fork this project or contribute to it. If you decide to contribute, please create a seperate branch and a pull request. Thanks.
 
 ---
 

@@ -1,29 +1,12 @@
 services:
-  backend:
-    build: ./backend
-    container_name: gigmaster-backend
+  gigmaster:
+    build: .
+    container_name: gigmaster
     ports:
       - "3000:3000"
     volumes:
-      - "./lyrics:/app/lyrics:rw"
-      - "./backend:/app:ro"
+      # local lyrics folder
+      - ./lyrics:/app/lyrics
+    restart: unless-stopped
     environment:
       - NODE_ENV=production
-    restart: unless-stopped
-
-  frontend:
-    build: ./frontend
-    container_name: gigmaster-frontend
-    ports:
-      - "5173:5173"
-    depends_on:
-      - backend
-    volumes:
-      - "./frontend:/app:ro"
-    environment:
-      - VITE_BACKEND_URL=http://localhost:3000
-    restart: unless-stopped
-
-volumes:
-  lyrics:
-    driver: local
