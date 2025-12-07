@@ -31,14 +31,16 @@ Gigmaster separates raw content from application logic.
 
 ```text
 gigmaster/
-├── lyrics/                 # 📂 YOUR CONTENT
-│   ├── demo-Song.txt       # Song lyrics
-│   └── properties/         # ⚙️ METADATA
-│       └── demo-Song.yaml # Title, Artist, BPM, Key
-├── backend/                # Node.js Express Server
-└── frontend/               # Vue 3 + Vite App
-├── Dockerfile              # builds the container
-└── docker-compose.yml      # runs the container
+├── lyrics/                     # 📂 YOUR CONTENT
+│   ├── demo-Song.txt           # Song lyrics
+│   └── properties/             # ⚙️ METADATA
+│       └── demo-Song.yaml      # Title, Artist, BPM, time sig, Key
+    └── setlists/               # 📂 YOUR CONTENT
+│       ├── demo-Setlist.json   # Song lyrics
+├── backend/                    # Node.js Express Server
+└── frontend/                   # Vue 3 + Vite App
+├── Dockerfile                  # builds the container
+└── docker-compose.yml          # runs the container
 ```
 
 ---
@@ -71,7 +73,7 @@ gigmaster/
 
 ## 🎵 Adding Songs
 
-You can add songs via the **"Add Song"** button in the UI, or manually by creating files:
+You can add songs via the **"Add Song"** button in the **Library** tab, or by manually creating files:
 
 1.  Create `lyrics/mysong.txt` with the lyrics.
 2.  (Optional) Create `lyrics/properties/mysong.yaml`:
@@ -81,6 +83,19 @@ You can add songs via the **"Add Song"** button in the UI, or manually by creati
     key: Am
     bpm: 120
     genre: Rock
+    ```
+
+## 🗒 Adding Setlists
+
+Setlists can also be added via the ** "Create" ** button in the **Setlists** tab or by manually creating files.
+1. Create "lyrics/setlists/mylist.json" with the song files.
+    ```json
+    {
+        "name": "Demo Setlist",
+        "songs": [
+        "demo-Song.txt"
+        ]
+    }
     ```
 
 ---
