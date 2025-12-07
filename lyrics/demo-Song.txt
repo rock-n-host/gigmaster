@@ -1,0 +1,18 @@
+
+[Verse]
+I’m typing out my code tonight,
+Blue and green lines looking right,
+Commit the change, I feel the buzz—
+Time to push it to the Hub!
+
+[Chorus]
+Oh GitHub, GitHub,
+Where all my branches grow,
+Merge my dreams together
+In a perfect workflow.
+Oh GitHub, GitHub,
+You keep my bugs at bay—
+I push, you pull, we sync,
+And ship the code away!
+
+    
