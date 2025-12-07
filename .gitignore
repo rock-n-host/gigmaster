@@ -3,5 +3,4 @@
 /.env
 /.env.local
 /.DS_Store
-/lyrics/*.yaml
-/lyrics/*.txt
+/lyrics/*

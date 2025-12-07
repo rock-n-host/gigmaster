@@ -1,7 +1,7 @@
-{
-  "name": "gigmaster-frontend",
-  "version": "2025-11-23",
-  "scripts": { "dev": "vite", "build": "vite build" },
-  "dependencies": { "vue": "^3.3.4", "axios": "^1.4.0", "lucide-vue-next": "^0.263.0" },
-  "devDependencies": { "@vitejs/plugin-vue": "^4.2.3", "vite": "^4.3.9" }
+{ 
+    "name": "gigmaster-frontend", 
+    "version": "2025.12.07", 
+    "scripts": { "dev": "vite", "build": "vite build" }, 
+    "dependencies": { "vue": "^3.3.4", "axios": "^1.4.0", "lucide-vue-next": "^0.263.0" }, 
+    "devDependencies": { "@vitejs/plugin-vue": "^4.2.3", "vite": "^4.3.9" } 
 }
