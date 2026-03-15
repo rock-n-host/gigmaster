@@ -44,6 +44,15 @@ The Setlist Builder supports Drag and Drop from the Library.
 
 ---
 
+## 📒 TODO
+
+- BPM in Song properties
+- multiple Setlists
+- editing Setlist order, deleting Songs
+- search bar in Song library
+
+---
+
 <div align="center">
   <sub>Built by <a href="https://github.com/rock-n-host">rock-n-host</a></sub> with a little bit of help from Gemini.
 </div>
