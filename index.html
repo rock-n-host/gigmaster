@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Gigmaster</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body data-theme="dark">
+        <nav class="navbar">
+            <h1>Gigmaster</h1>
+            <div class="nav-controls">
+                <button onclick="navigate('library')">Library</button>
+                <button onclick="navigate('setlists')">Setlists</button>
+                <button id="theme-toggle" onclick="toggleTheme()">
+                    ☀️ Light
+                </button>
+                <button onclick="exportData()">💾 Export</button>
+                <label for="import-file" class="btn-import">📂 Import</label>
+                <input
+                    type="file"
+                    id="import-file"
+                    accept=".json"
+                    onchange="importData(event)"
+                    hidden
+                />
+            </div>
+        </nav>
+
+        <main id="app-content">
+            <section id="view-library" class="view active">
+                <div class="view-header">
+                    <h2>Song Library</h2>
+                    <button class="primary-btn" onclick="openModal()">
+                        + Add New Song
+                    </button>
+                </div>
+                <div id="song-grid" class="grid"></div>
+            </section>
+
+            <section id="view-lyric" class="view hidden">
+                <div class="view-header">
+                    <button onclick="navigate('library')">← Back</button>
+                    <div class="scroll-controls">
+                        <button id="scroll-btn" onclick="toggleAutoScroll()">
+                            Play Auto-Scroll
+                        </button>
+                    </div>
+                    <button onclick="editCurrentSong()">Edit Song</button>
+                </div>
+                <div class="lyric-header">
+                    <h2 id="detail-title"></h2>
+                    <p id="detail-meta"></p>
+                </div>
+                <pre id="detail-lyrics"></pre>
+            </section>
+
+            <section id="view-setlists" class="view hidden">
+                <div class="view-header">
+                    <h2>Setlist Builder</h2>
+                </div>
+                <div class="setlist-container">
+                    <div class="available-songs">
+                        <h3>Available Songs (Drag me)</h3>
+                        <ul id="drag-source" class="song-list"></ul>
+                    </div>
+                    <div class="active-setlist">
+                        <h3>Your Setlist (Drop here)</h3>
+                        <ul id="drop-target" class="song-list dropzone"></ul>
+                        <button
+                            class="danger-btn mt-1"
+                            onclick="clearSetlist()"
+                        >
+                            Clear Setlist
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <div id="song-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2 id="modal-title">Add/Edit Song</h2>
+                <input type="hidden" id="song-id" />
+
+                <label>Title</label>
+                <input type="text" id="song-title" required />
+
+                <label>Band/Artist</label>
+                <input type="text" id="song-band" />
+
+                <div class="row">
+                    <div>
+                        <label>Key</label>
+                        <input
+                            type="text"
+                            id="song-key"
+                            placeholder="e.g., G Major"
+                        />
+                    </div>
+                    <div>
+                        <label>Time Signature</label>
+                        <input
+                            type="text"
+                            id="song-time"
+                            placeholder="e.g., 4/4"
+                        />
+                    </div>
+                </div>
+
+                <label>Lyrics</label>
+                <textarea id="song-lyrics" rows="10" required></textarea>
+
+                <div class="modal-actions">
+                    <button onclick="closeModal()">Cancel</button>
+                    <button class="primary-btn" onclick="saveSong()">
+                        Save Song
+                    </button>
+                    <button
+                        class="danger-btn"
+                        id="delete-btn"
+                        onclick="deleteSong()"
+                        style="display: none"
+                    >
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <script src="app.js"></script>
+    </body>
+</html>

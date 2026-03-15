@@ -1,0 +1,11 @@
+services:
+  gigmaster:
+    build: .
+    container_name: gigmaster
+    ports:
+      - "3000:3000"
+    volumes:
+      # local lyrics folder
+      - ./app:/app
+    restart: unless-stopped
+    user: ${CURRENT_UID}
