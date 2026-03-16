@@ -35,18 +35,45 @@
                         + Add New Song
                     </button>
                 </div>
+
+                <div class="search-container">
+                    <input
+                        type="text"
+                        id="search-bar"
+                        placeholder="Search songs by title, band, or lyrics..."
+                        oninput="renderLibrary()"
+                    />
+                </div>
+
                 <div id="song-grid" class="grid"></div>
             </section>
 
             <section id="view-lyric" class="view hidden">
                 <div class="view-header">
-                    <button onclick="navigate('library')">← Back</button>
+                    <button onclick="goBack()">← Back</button>
+
+                    <div
+                        id="setlist-nav"
+                        class="setlist-nav"
+                        style="display: none"
+                    >
+                        <button id="btn-prev" onclick="navigateSetlist(-1)">
+                            ⏮ Prev
+                        </button>
+                        <span id="setlist-progress" class="progress-text"
+                            >1 / 10</span
+                        >
+                        <button id="btn-next" onclick="navigateSetlist(1)">
+                            Next ⏭
+                        </button>
+                    </div>
+
                     <div class="scroll-controls">
                         <button id="scroll-btn" onclick="toggleAutoScroll()">
                             Play Auto-Scroll
                         </button>
+                        <button onclick="editCurrentSong()">Edit</button>
                     </div>
-                    <button onclick="editCurrentSong()">Edit Song</button>
                 </div>
                 <div class="lyric-header">
                     <h2 id="detail-title"></h2>
@@ -56,27 +83,52 @@
             </section>
 
             <section id="view-setlists" class="view hidden">
-                <div class="view-header">
-                    <h2>Setlist Builder</h2>
+                <div class="view-header setlist-header">
+                    <h2>Setlist Manager</h2>
+                    <div class="setlist-controls">
+                        <select
+                            id="setlist-selector"
+                            onchange="changeActiveSetlist()"
+                        ></select>
+                        <button onclick="createNewSetlist()">+ New</button>
+                        <button
+                            class="danger-btn"
+                            onclick="deleteActiveSetlist()"
+                        >
+                            Delete
+                        </button>
+                        <button
+                            class="primary-btn"
+                            onclick="playActiveSetlist()"
+                        >
+                            ▶ Play Setlist
+                        </button>
+                    </div>
                 </div>
                 <div class="setlist-container">
                     <div class="available-songs">
-                        <h3>Available Songs (Drag me)</h3>
+                        <h3>Library (Drag or Click +)</h3>
                         <ul id="drag-source" class="song-list"></ul>
                     </div>
                     <div class="active-setlist">
-                        <h3>Your Setlist (Drop here)</h3>
+                        <h3>Current Setlist (Drop here)</h3>
                         <ul id="drop-target" class="song-list dropzone"></ul>
-                        <button
-                            class="danger-btn mt-1"
-                            onclick="clearSetlist()"
-                        >
-                            Clear Setlist
-                        </button>
                     </div>
                 </div>
             </section>
         </main>
+
+        <footer class="app-footer">
+            <p>
+                Made by
+                <a
+                    href="https://github.com/my-user"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >my-user</a
+                >
+            </p>
+        </footer>
 
         <div id="song-modal" class="modal hidden">
             <div class="modal-content">
@@ -95,16 +147,20 @@
                         <input
                             type="text"
                             id="song-key"
-                            placeholder="e.g., G Major"
+                            placeholder="e.g., G"
                         />
                     </div>
                     <div>
-                        <label>Time Signature</label>
+                        <label>Time Sig</label>
                         <input
                             type="text"
                             id="song-time"
                             placeholder="e.g., 4/4"
                         />
+                    </div>
+                    <div>
+                        <label>BPM</label>
+                        <input type="number" id="song-bpm" placeholder="120" />
                     </div>
                 </div>
 
