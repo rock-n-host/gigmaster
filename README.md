@@ -40,16 +40,15 @@ You can drag and  songs via the **"Add Song"** button in the **Library** tab, or
 
 ## 🗒 Adding Setlists
 
-The Setlist Builder supports Drag and Drop from the Library.
+There is a default Setlist that can be edited. New ones can be added and also removed. The "Play Setlist" feature displays Songs in order and allows switching to the previous/next one.
 
 ---
 
 ## 📒 TODO
 
-- BPM in Song properties
-- multiple Setlists
-- editing Setlist order, deleting Songs
-- search bar in Song library
+- show pulsing dot based on BPM
+- on some Hosts only the index.html file can load
+- one "gigmaster.html" with scripts and styles so it can run everywhere
 
 ---
 
