@@ -48,7 +48,7 @@ There is a default Setlist that can be edited. New ones can be added and also re
 
 - show pulsing dot based on BPM
 - on some Hosts only the index.html file can load
-- one "gigmaster.html" with scripts and styles so it can run everywhere
+- turn it into a progressive webapp so it works properly on mobile devices
 
 ---
 

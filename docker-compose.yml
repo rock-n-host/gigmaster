@@ -3,7 +3,7 @@ services:
     build: .
     container_name: gigmaster
     ports:
-      - "3000:3000"
+      - "8080:80"
     volumes:
       # local lyrics folder
       - ./app:/app
