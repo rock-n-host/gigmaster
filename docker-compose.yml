@@ -1,11 +1,9 @@
+version: "3"
 services:
   gigmaster:
-    build: .
-    container_name: gigmaster
-    ports:
-      - "8080:80"
+    image: nginx:latest
+    container_name: gigmaster-nginx
+    restart: always
+    network_mode: "bridge"
     volumes:
-      # local lyrics folder
-      - ./app:/app
-    restart: unless-stopped
-    user: ${CURRENT_UID}
+      - ./index.html:/usr/share/nginx/html
