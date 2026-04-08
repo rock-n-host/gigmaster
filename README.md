@@ -47,11 +47,10 @@ There is a default Setlist that can be edited. New ones can be added and also re
 ## 📒 TODO
 
 - show pulsing dot based on BPM
-- on some Hosts only the index.html file can load
-- turn it into a progressive webapp so it works properly on mobile devices
+- backing track playback (if possible)
 
 ---
 
 <div align="center">
-  <sub>Built by <a href="https://github.com/rock-n-host">rock-n-host</a></sub> with a little bit of help from Gemini.
+  Built by <a href="https://github.com/rock-n-host">rock-n-host</a> with some help from Gemini.
 </div>
