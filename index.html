@@ -980,7 +980,8 @@
             function exportData() {
                 const dataStr =
                     "data:text/json;charset=utf-8," +
-                    encodeURIComponent(JSON.stringify(state));
+                    encodeURIComponent(JSON.stringify(state, null, 4));
+
                 const downloadAnchorNode = document.createElement("a");
                 downloadAnchorNode.setAttribute("href", dataStr);
                 downloadAnchorNode.setAttribute(
