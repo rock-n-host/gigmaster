@@ -3,30 +3,28 @@
   <h1>Gigmaster</h1>
   <p><strong>A simple, self-hosted lyrics library without dependenvies.</strong></p>
 
-  ![Version](https://img.shields.io/badge/version-2026.03.15-blue?style=flat-square)
+  ![Version](https://img.shields.io/badge/version-2026.05.29-blue?style=flat-square)
 </div>
 
 ---
 
-## 🎸 Overview
+## Overview
 
 **Gigmaster** is a lightweight, responsive web application designed to manage and display lyrics during gigs or rehearsals. It is built to be self-hosted and uses a simple flat-file structure. My goal was to make it as simple as possible so no external frameworks are used, only pure HTML, CSS and javascript.
 
-### ✨ Features
+### Features
 * **Dark Mode UI:** Optimized for low-light stage environments.
 * **Card Grid Layout:** Easy touch navigation for song selection.
-* **Flat-File structure:** Lyrics are stored inside `localStorage` in the Browser and can be imported / exported as JSON. The application itself is just some HTML, CSS and javascript files.
+* **Flat-File structure:** Lyrics are stored inside `localStorage` in the Browser and can be imported / exported as JSON. The application itself is just one html file containing everything.
 
 
 ---
 
-## 🚀 Usage
+## Usage
 
-### Option 1: Like every normal human
-Right-click the index.html file and open with a Browser. The index.html loads everything else instantly after being opened.
+Right-click the index.html file and open with a Browser. Everything loads instantly.
 
-### Option 2: Docker Compose
-If you want to serve it with Nginx, Apache or something else.
+If you want to host it with Nginx, Apache or something else.
 1.  run:
     ```bash
     docker-compose up -d
@@ -34,20 +32,25 @@ If you want to serve it with Nginx, Apache or something else.
 2. go to ``` http://localhost:8080 ```.
 ---
 
-## 🎵 Adding Songs
+## Adding Songs
 
 You can drag and  songs via the **"Add Song"** button in the **Library** tab, or by importing from the JSON.
 
-## 🗒 Adding Setlists
+## Adding Setlists
 
 There is a default Setlist that can be edited. New ones can be added and also removed. The "Play Setlist" feature displays Songs in order and allows switching to the previous/next one.
 
 ---
 
-## 📒 TODO
+## TODO
 
-- show pulsing dot based on BPM
+- toggle audio click on/off, keep visual
 - backing track playback (if possible)
+
+## Nice to have
+
+- default settings
+- save settings to json
 
 ---
 
