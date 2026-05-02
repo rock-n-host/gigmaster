@@ -1,978 +1,990 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gigmaster</title>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Gigmaster</title>
 
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23bb86fc'><path d='M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z'/></svg>" />
+        <!-- SVG Favicon -->
+        <link
+            rel="icon"
+            type="image/svg+xml"
+            href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23248f24'><path d='M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z'/></svg>"
+        />
 
-    <style>
-        /* --- CSS VARIABLES & THEMING --- */
-        /* We use variables so switching to light mode is just a matter of overriding these values */
-        :root {
-            --bg-color: #121212;
-            --surface-color: #1e1e1e;
-            --text-color: #ffffff;
-            --text-muted: #a0a0a0;
-            --primary-color: #bb86fc;
-            --danger-color: #cf6679;
-            --border-radius: 8px;
-        }
+        <style>
+            /* --- CSS VARIABLES & THEMING --- */
+            :root {
+                --bg-color: #121212;
+                --surface-color: #1e1e1e;
+                --text-color: #ffffff;
+                --text-muted: #a0a0a0;
+                --primary-color: #248f24;
+                --danger-color: #2eb82e;
+                --border-radius: 8px;
+            }
 
-        /* Light theme overrides applied when data-theme="light" is on the body */
-        body[data-theme="light"] {
-            --bg-color: #f5f5f5;
-            --surface-color: #ffffff;
-            --text-color: #000000;
-            --text-muted: #666666;
-            --primary-color: #6200ee;
-            --danger-color: #b00020;
-        }
+            body[data-theme="light"] {
+                --bg-color: #f5f5f5;
+                --surface-color: #ffffff;
+                --text-color: #000000;
+                --text-muted: #666666;
+                --primary-color: #196719;
+                --danger-color: #239023;
+            }
 
-        /* --- GLOBAL STYLES --- */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            transition: background-color 0.3s, color 0.3s;
-        }
+            /* --- GLOBAL STYLES --- */
+            body {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                    Helvetica, Arial, sans-serif;
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                margin: 0;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+                transition:
+                    background-color 0.3s,
+                    color 0.3s;
+            }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 24px;
-            background-color: var(--surface-color);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
+            header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 16px 24px;
+                background-color: var(--surface-color);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
 
-        main {
-            padding: 24px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+            main {
+                padding: 24px;
+                max-width: 1200px;
+                margin: 0 auto;
+                flex: 1; /* Pushes footer to bottom */
+                width: 100%;
+                box-sizing: border-box;
+            }
 
-        /* --- NAVIGATION & VIEWS --- */
-        /* Hide all views by default, only show the one with the 'active' class */
-        .view {
-            display: none;
-        }
-        .view.active {
-            display: block;
-        }
+            footer {
+                text-align: center;
+                padding: 20px;
+                background-color: var(--surface-color);
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+                color: var(--text-muted);
+                font-size: 14px;
+            }
 
-        .main-nav {
-            margin-bottom: 24px;
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
+            footer a {
+                color: var(--primary-color);
+                text-decoration: none;
+            }
 
-        /* --- BUTTONS & INPUTS --- */
-        button {
-            background-color: var(--surface-color);
-            color: var(--text-color);
-            border: 1px solid var(--primary-color);
-            padding: 8px 16px;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: 14px;
-            transition: 0.2s;
-        }
+            footer a:hover {
+                text-decoration: underline;
+            }
 
-        button:hover {
-            background-color: var(--primary-color);
-            color: var(--bg-color);
-        }
+            /* --- NAVIGATION & VIEWS --- */
+            .view {
+                display: none;
+            }
+            .view.active {
+                display: block;
+            }
 
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+            .main-nav {
+                margin-bottom: 24px;
+                display: flex;
+                gap: 12px;
+                flex-wrap: wrap;
+            }
 
-        .primary-btn {
-            background-color: var(--primary-color);
-            color: #000;
-        }
+            /* --- BUTTONS & INPUTS --- */
+            button {
+                background-color: var(--surface-color);
+                color: var(--text-color);
+                border: 1px solid var(--primary-color);
+                padding: 8px 16px;
+                border-radius: var(--border-radius);
+                cursor: pointer;
+                font-size: 14px;
+                transition: 0.2s;
+            }
 
-        .danger-btn {
-            border-color: var(--danger-color);
-            color: var(--danger-color);
-        }
-        .danger-btn:hover {
-            background-color: var(--danger-color);
-            color: #fff;
-        }
-
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 16px;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            border: 1px solid var(--text-muted);
-            border-radius: var(--border-radius);
-            box-sizing: border-box;
-        }
-
-        /* --- GRID & CARDS (LIBRARY) --- */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 16px;
-        }
-
-        .card {
-            background-color: var(--surface-color);
-            padding: 16px;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            border: 1px solid transparent;
-            transition: border-color 0.2s;
-        }
-
-        .card:hover {
-            border-color: var(--primary-color);
-        }
-
-        .card h3 {
-            margin: 0 0 8px 0;
-        }
-
-        .card-meta {
-            font-size: 12px;
-            color: var(--text-muted);
-        }
-
-        /* --- DRAG AND DROP (SETLISTS) --- */
-        .setlist-container {
-            display: flex;
-            gap: 24px;
-        }
-        .setlist-pane {
-            flex: 1;
-            background-color: var(--surface-color);
-            padding: 16px;
-            border-radius: var(--border-radius);
-            min-height: 300px;
-        }
-        .song-list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            background-color: var(--bg-color);
-            margin-bottom: 8px;
-            border-radius: 4px;
-        }
-        .draggable {
-            cursor: grab;
-        }
-        .drag-over {
-            border: 2px dashed var(--primary-color);
-        }
-
-        /* --- LYRIC VIEW --- */
-        .lyric-controls {
-            position: sticky;
-            top: 0;
-            background-color: var(--bg-color);
-            padding: 12px 0;
-            display: flex;
-            gap: 12px;
-            border-bottom: 1px solid var(--surface-color);
-            margin-bottom: 24px;
-            align-items: center;
-        }
-
-        .lyrics-text {
-            white-space: pre-wrap;
-            font-size: 20px;
-            line-height: 1.6;
-            padding-bottom: 100vh; /* Gives room to auto-scroll to the very end */
-        }
-
-        /* --- MODAL --- */
-        .modal {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0,0,0,0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 24px;
-            z-index: 1000;
-        }
-        .modal.hidden {
-            display: none;
-        }
-        .modal-content {
-            background-color: var(--surface-color);
-            padding: 24px;
-            border-radius: var(--border-radius);
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .modal-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 16px;
-        }
-
-        /* --- METRONOME ANIMATION --- */
-        @keyframes pulse-beat {
-            0% {
+            button:hover {
                 background-color: var(--primary-color);
-                color: #000;
-                transform: scale(1.05);
+                color: #ffffff;
             }
-            100% {
-                background-color: transparent;
-                color: inherit;
-                transform: scale(1);
+
+            .primary-btn {
+                background-color: var(--primary-color);
+                color: #ffffff;
             }
-        }
-        .flash-beat {
-            animation: pulse-beat 0.15s ease-out;
-        }
-    </style>
-</head>
-<body data-theme="dark">
 
-    <header>
-        <div style="display: flex; align-items: center; gap: 12px;">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="var(--primary-color)" width="32" height="32">
-                <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-            </svg>
-            <h1 style="margin: 0;">Gigmaster</h1>
-        </div>
-        <button id="theme-toggle" onclick="toggleTheme()">☀️ Light</button>
-    </header>
+            .danger-btn {
+                border-color: var(--danger-color);
+                color: var(--danger-color);
+            }
 
-    <main>
-        <div class="main-nav">
-            <button onclick="navigate('library')" class="primary-btn">📚 Library</button>
-            <button onclick="navigate('setlists')" class="primary-btn">📋 Setlists</button>
-            <button onclick="openModal()">➕ Add Song</button>
-            <button onclick="exportData()">💾 Export Backup</button>
-            <input type="file" id="import-file" style="display: none;" accept=".json" onchange="importData(event)">
-            <button onclick="document.getElementById('import-file').click()">📂 Import Backup</button>
-        </div>
+            input,
+            textarea,
+            select {
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 16px;
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                border: 1px solid var(--text-muted);
+                border-radius: var(--border-radius);
+                box-sizing: border-box;
+            }
 
-        <div id="view-library" class="view active">
-            <h2>Song Library</h2>
-            <input type="text" id="search-bar" placeholder="Search by title, band, or lyrics..." oninput="renderLibrary()">
-            <div id="song-grid" class="grid">
-                </div>
-        </div>
+            /* --- GRID & CARDS --- */
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 16px;
+            }
 
-        <div id="view-setlists" class="view">
-            <h2>Setlists</h2>
-            <div style="display: flex; gap: 12px; margin-bottom: 24px;">
-                <select id="setlist-selector" onchange="changeActiveSetlist()" style="width: auto; margin: 0;"></select>
-                <button onclick="createNewSetlist()">New Setlist</button>
-                <button onclick="deleteActiveSetlist()" class="danger-btn">Delete Setlist</button>
-                <button onclick="playActiveSetlist()" class="primary-btn" style="margin-left: auto;">▶️ Play Setlist</button>
-            </div>
+            .card {
+                background-color: var(--surface-color);
+                padding: 16px;
+                border-radius: var(--border-radius);
+                cursor: pointer;
+                border: 1px solid transparent;
+                transition: border-color 0.2s;
+            }
 
-            <div class="setlist-container">
-                <div class="setlist-pane">
-                    <h3>Available Songs</h3>
-                    <p class="card-meta">Drag songs over to the setlist, or click '+'</p>
-                    <ul id="drag-source" style="list-style: none; padding: 0;"></ul>
-                </div>
+            .card:hover {
+                border-color: var(--primary-color);
+            }
 
-                <div class="setlist-pane">
-                    <h3>Current Setlist</h3>
-                    <p class="card-meta">Drag and drop here, or use arrows to reorder</p>
-                    <ul id="drop-target" style="list-style: none; padding: 0; min-height: 200px;"></ul>
-                </div>
-            </div>
-        </div>
+            .card-meta {
+                font-size: 12px;
+                color: var(--text-muted);
+            }
 
-        <div id="view-lyric" class="view">
-            <div class="lyric-controls">
-                <button onclick="goBack()">⬅ Back</button>
-                <button onclick="editCurrentSong()">Edit Song</button>
-                <button id="scroll-btn" onclick="toggleAutoScroll()">Play Auto-Scroll</button>
-                <button id="metronome-btn" class="icon-btn" onclick="toggleMetronome()" style="display: none;">Play Metronome ▶️</button>
+            /* --- SETLISTS --- */
+            .setlist-container {
+                display: flex;
+                gap: 24px;
+            }
+            .setlist-pane {
+                flex: 1;
+                background-color: var(--surface-color);
+                padding: 16px;
+                border-radius: var(--border-radius);
+                min-height: 300px;
+            }
+            .song-list-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px;
+                background-color: var(--bg-color);
+                margin-bottom: 8px;
+                border-radius: 4px;
+            }
+            .draggable {
+                cursor: grab;
+            }
+            .drag-over {
+                border: 2px dashed var(--primary-color);
+            }
 
-                <div id="setlist-nav" style="display: none; margin-left: auto; align-items: center; gap: 12px;">
-                    <button id="btn-prev" onclick="navigateSetlist(-1)">⏮ Prev</button>
-                    <span id="setlist-progress" style="font-weight: bold;"></span>
-                    <button id="btn-next" onclick="navigateSetlist(1)">Next ⏭</button>
-                </div>
-            </div>
+            /* --- LYRIC VIEW --- */
+            .lyric-controls {
+                position: sticky;
+                top: 0;
+                background-color: var(--bg-color);
+                padding: 12px 0;
+                display: flex;
+                gap: 12px;
+                border-bottom: 1px solid var(--surface-color);
+                margin-bottom: 24px;
+                align-items: center;
+                z-index: 10;
+            }
 
-            <h1 id="detail-title"></h1>
-            <p id="detail-meta" class="card-meta"></p>
-            <div id="detail-lyrics" class="lyrics-text"></div>
-        </div>
-    </main>
+            .lyrics-text {
+                white-space: pre-wrap;
+                font-size: 20px;
+                line-height: 1.6;
+                padding-bottom: 100vh;
+            }
 
-    <div id="song-modal" class="modal hidden">
-        <div class="modal-content">
-            <h2 id="modal-title">Add New Song</h2>
-            <input type="hidden" id="song-id">
+            /* --- MODAL --- */
+            .modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 24px;
+                z-index: 1000;
+            }
+            .modal.hidden {
+                display: none;
+            }
+            .modal-content {
+                background-color: var(--surface-color);
+                padding: 24px;
+                border-radius: var(--border-radius);
+                width: 100%;
+                max-width: 500px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
 
-            <label>Title*</label>
-            <input type="text" id="song-title" placeholder="e.g. Master of Puppets">
-
-            <label>Band/Artist</label>
-            <input type="text" id="song-band" placeholder="e.g. Metallica">
-
-            <div style="display: flex; gap: 12px;">
-                <div style="flex: 1;">
-                    <label>Key</label>
-                    <input type="text" id="song-key" placeholder="e.g. E Minor">
-                </div>
-                <div style="flex: 1;">
-                    <label>Time</label>
-                    <input type="text" id="song-time" placeholder="e.g. 4/4">
-                </div>
-                <div style="flex: 1;">
-                    <label>BPM</label>
-                    <input type="number" id="song-bpm" placeholder="e.g. 212">
-                </div>
-            </div>
-
-            <label>Lyrics / Chords</label>
-            <textarea id="song-lyrics" rows="10" placeholder="Type or paste lyrics here..."></textarea>
-
-            <div class="modal-actions">
-                <button id="delete-btn" class="danger-btn" onclick="deleteSong()">Delete Song</button>
-                <div style="margin-left: auto; display: flex; gap: 12px;">
-                    <button onclick="closeModal()">Cancel</button>
-                    <button onclick="saveSong()" class="primary-btn">Save Song</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // ==========================================
-        // STATE MANAGEMENT
-        // ==========================================
-        // This object holds the entire state of the application.
-        // It makes saving and loading from local storage/JSON extremely easy.
-        let state = {
-            songs: [],
-            setlists: [
-                { id: "default", name: "My First Setlist", songIds: [] },
-            ],
-            activeSetlistId: "default",
-            theme: "dark",
-        };
-
-        // Temporary application state (not saved to local storage)
-        let currentSongId = null;
-        let autoScrollInterval = null;
-        let isPlayingSetlist = false;
-        let currentPlayingIndex = 0;
-
-        // --- Metronome State ---
-        let audioCtx;
-        let metronomeInterval = null;
-        let isMetronomePlaying = false;
-        let currentSongBpm = null;
-
-        function loadData() {
-            // Check if user has saved data in their browser previously
-            const saved = localStorage.getItem("GigmasterState");
-            if (saved) {
-                let parsed = JSON.parse(saved);
-                // Backward compatibility check: if older version didn't have multiple setlists
-                if (!parsed.setlists) {
-                    parsed.setlists = [
-                        {
-                            id: "default",
-                            name: "My First Setlist",
-                            songIds: parsed.setlistIds || [],
-                        },
-                    ];
-                    parsed.activeSetlistId = "default";
+            @keyframes pulse-beat {
+                0% {
+                    background-color: var(--primary-color);
+                    transform: scale(1.05);
                 }
-                state = parsed;
+                100% {
+                    background-color: transparent;
+                    transform: scale(1);
+                }
+            }
+            .flash-beat {
+                animation: pulse-beat 0.15s ease-out;
+            }
+        </style>
+    </head>
+    <body data-theme="dark">
+        <header>
+            <div style="display: flex; align-items: center; gap: 12px">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="var(--primary-color)"
+                    width="32"
+                    height="32"
+                >
+                    <path
+                        d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"
+                    />
+                </svg>
+                <h1 style="margin: 0">Gigmaster</h1>
+            </div>
+            <button id="theme-toggle" onclick="toggleTheme()">☀️ Light</button>
+        </header>
+
+        <main>
+            <div class="main-nav">
+                <button onclick="navigate('library')">📚 Library</button>
+                <button onclick="navigate('setlists')">📋 Setlists</button>
+                <button onclick="openModal()" class="buttonn">
+                    ➕ Add Song
+                </button>
+                <button onclick="exportData()">💾 Export Backup</button>
+                <input
+                    type="file"
+                    id="import-file"
+                    style="display: none"
+                    accept=".json"
+                    onchange="importData(event)"
+                />
+                <button
+                    onclick="document.getElementById('import-file').click()"
+                >
+                    📂 Import Backup
+                </button>
+            </div>
+
+            <!-- VIEW: LIBRARY -->
+            <div id="view-library" class="view active">
+                <h2>Song Library</h2>
+                <input
+                    type="text"
+                    id="search-bar"
+                    placeholder="Search songs..."
+                    oninput="renderLibrary()"
+                />
+                <div id="song-grid" class="grid"></div>
+            </div>
+
+            <!-- VIEW: SETLISTS -->
+            <div id="view-setlists" class="view">
+                <h2>Setlists</h2>
+                <div style="display: flex; gap: 12px; margin-bottom: 24px">
+                    <select
+                        id="setlist-selector"
+                        onchange="changeActiveSetlist()"
+                        style="width: auto; margin: 0"
+                    ></select>
+                    <button onclick="createNewSetlist()">New Setlist</button>
+                    <button onclick="deleteActiveSetlist()" class="danger-btn">
+                        Delete
+                    </button>
+                    <button
+                        onclick="playActiveSetlist()"
+                        class="primary-btn"
+                        style="margin-left: auto"
+                    >
+                        ▶️ Play
+                    </button>
+                </div>
+                <div class="setlist-container">
+                    <div class="setlist-pane">
+                        <h3>Available</h3>
+                        <ul
+                            id="drag-source"
+                            style="list-style: none; padding: 0"
+                        ></ul>
+                    </div>
+                    <div class="setlist-pane">
+                        <h3>Current Setlist</h3>
+                        <ul
+                            id="drop-target"
+                            style="
+                                list-style: none;
+                                padding: 0;
+                                min-height: 200px;
+                            "
+                        ></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: LYRICS -->
+            <div id="view-lyric" class="view">
+                <div class="lyric-controls">
+                    <button onclick="goBack()">⬅ Back</button>
+                    <button onclick="editCurrentSong()">Edit</button>
+                    <button id="scroll-btn" onclick="toggleAutoScroll()">
+                        Auto-Scroll
+                    </button>
+                    <button
+                        id="metronome-btn"
+                        onclick="toggleMetronome()"
+                        style="display: none"
+                    >
+                        Metronome ▶️
+                    </button>
+
+                    <div
+                        id="setlist-nav"
+                        style="
+                            display: none;
+                            margin-left: auto;
+                            align-items: center;
+                            gap: 12px;
+                        "
+                    >
+                        <button id="btn-prev" onclick="navigateSetlist(-1)">
+                            ⏮
+                        </button>
+                        <span id="setlist-progress"></span>
+                        <button id="btn-next" onclick="navigateSetlist(1)">
+                            ⏭
+                        </button>
+                    </div>
+                </div>
+                <h1 id="detail-title"></h1>
+                <p id="detail-meta" class="card-meta"></p>
+                <div
+                    id="audio-player-container"
+                    style="
+                        display: none;
+                        margin-bottom: 24px;
+                        padding: 12px;
+                        background-color: var(--surface-color);
+                        border-radius: var(--border-radius);
+                    "
+                >
+                    <span
+                        id="audio-player-label"
+                        style="
+                            display: block;
+                            margin-bottom: 8px;
+                            font-weight: bold;
+                        "
+                    ></span>
+                    <audio
+                        id="audio-player"
+                        controls
+                        style="width: 100%; height: 36px"
+                    ></audio>
+                </div>
+                <div id="detail-lyrics" class="lyrics-text"></div>
+            </div>
+        </main>
+
+        <footer>
+            Made by
+            <a href="https://github.com/rock-n-host" target="_blank"
+                >rock-n-host</a
+            >
+        </footer>
+
+        <!-- MODAL -->
+        <div id="song-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2 id="modal-title">Add New Song</h2>
+                <input type="hidden" id="song-id" />
+                <label>Title*</label>
+                <input type="text" id="song-title" />
+                <label>Band</label>
+                <input type="text" id="song-band" />
+
+                <div style="display: flex; gap: 12px">
+                    <div style="flex: 1">
+                        <label>Key</label>
+                        <input type="text" id="song-key" />
+                    </div>
+                    <div style="flex: 1">
+                        <label>Time Sig</label>
+                        <input
+                            type="text"
+                            id="song-time"
+                            placeholder="e.g. 4/4"
+                        />
+                    </div>
+                    <div style="flex: 1">
+                        <label>BPM</label>
+                        <input type="number" id="song-bpm" />
+                    </div>
+                </div>
+
+                <label>Audio Sample (Max 2.5MB)</label>
+                <div
+                    style="
+                        display: flex;
+                        gap: 12px;
+                        align-items: center;
+                        margin-bottom: 16px;
+                    "
+                >
+                    <input
+                        type="file"
+                        id="song-audio-file"
+                        accept="audio/*"
+                        style="margin-bottom: 0"
+                    />
+                    <button
+                        id="clear-audio-btn"
+                        class="danger-btn"
+                        onclick="clearAudioSelection()"
+                        style="display: none"
+                    >
+                        ✖
+                    </button>
+                </div>
+                <p
+                    id="audio-status"
+                    class="card-meta"
+                    style="margin-top: -10px"
+                ></p>
+
+                <label>Lyrics / Chords</label>
+                <textarea id="song-lyrics" rows="10"></textarea>
+
+                <div
+                    style="
+                        display: flex;
+                        justify-content: space-between;
+                        margin-top: 16px;
+                    "
+                >
+                    <button
+                        id="delete-btn"
+                        class="danger-btn"
+                        onclick="deleteSong()"
+                    >
+                        Delete
+                    </button>
+                    <div style="display: flex; gap: 12px">
+                        <button onclick="closeModal()">Cancel</button>
+                        <button onclick="saveSong()" class="primary-btn">
+                            Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // State and Logic remain the same as previous functional version
+            let state = {
+                songs: [],
+                setlists: [
+                    { id: "default", name: "My First Setlist", songIds: [] },
+                ],
+                activeSetlistId: "default",
+                theme: "dark",
+            };
+            let currentSongId = null,
+                autoScrollInterval = null,
+                isPlayingSetlist = false,
+                currentPlayingIndex = 0;
+            let audioCtx,
+                metronomeInterval = null,
+                isMetronomePlaying = false,
+                currentSongBpm = null;
+            let tempAudioBase64 = null,
+                tempAudioName = null;
+
+            function loadData() {
+                const saved = localStorage.getItem("GigmasterState");
+                if (saved) state = JSON.parse(saved);
+                applyTheme(state.theme);
+                renderLibrary();
+                updateSetlistDropdown();
+                renderSetlistSource();
+                renderActiveSetlist();
             }
 
-            // Apply loaded state to the UI
-            applyTheme(state.theme);
-            renderLibrary();
-            updateSetlistDropdown();
-            renderSetlistSource();
-            renderActiveSetlist();
-        }
+            function saveData() {
+                localStorage.setItem("GigmasterState", JSON.stringify(state));
+            }
 
-        function saveData() {
-            // Convert the state object to a string and save it to the browser
-            localStorage.setItem("GigmasterState", JSON.stringify(state));
-        }
+            function navigate(viewId) {
+                document
+                    .querySelectorAll(".view")
+                    .forEach((el) => el.classList.remove("active"));
+                document
+                    .getElementById(`view-${viewId}`)
+                    .classList.add("active");
+                window.scrollTo(0, 0);
+                stopAutoScroll();
+                stopMetronome();
+                const p = document.getElementById("audio-player");
+                if (p) {
+                    p.pause();
+                    p.currentTime = 0;
+                }
+            }
 
-        // ==========================================
-        // NAVIGATION & UI
-        // ==========================================
-        function navigate(viewId) {
-            // Hide all views, then unhide the requested one
-            document.querySelectorAll(".view").forEach((el) => el.classList.remove("active"));
-            document.getElementById(`view-${viewId}`).classList.add("active");
+            function goBack() {
+                isPlayingSetlist ? navigate("setlists") : navigate("library");
+            }
 
-            // Reset page position and stop background tasks
-            window.scrollTo(0, 0);
-            stopAutoScroll();
-            stopMetronome();
-        }
+            function toggleTheme() {
+                state.theme = state.theme === "dark" ? "light" : "dark";
+                applyTheme(state.theme);
+                saveData();
+            }
 
-        function goBack() {
-            stopAutoScroll();
-            stopMetronome();
-            // Context-aware back button: if in a setlist, go back to setlists. Otherwise, library.
-            if (isPlayingSetlist) {
-                navigate("setlists");
-            } else {
+            function applyTheme(theme) {
+                document.body.setAttribute("data-theme", theme);
+                document.getElementById("theme-toggle").textContent =
+                    theme === "dark" ? "☀️ Light" : "🌙 Dark";
+            }
+
+            function renderLibrary() {
+                const grid = document.getElementById("song-grid");
+                grid.innerHTML = "";
+                const search = document
+                    .getElementById("search-bar")
+                    .value.toLowerCase();
+                state.songs
+                    .filter(
+                        (s) =>
+                            s.title.toLowerCase().includes(search) ||
+                            (s.band && s.band.toLowerCase().includes(search)),
+                    )
+                    .forEach((song) => {
+                        const card = document.createElement("div");
+                        card.className = "card";
+                        card.onclick = () => {
+                            isPlayingSetlist = false;
+                            viewSong(song.id);
+                        };
+                        card.innerHTML = `<h3>${song.title}${song.audioBase64 ? " 🎵" : ""}</h3>
+                                      <div class="card-meta">${song.band || "Artist"} • Key: ${song.key || "N/A"} • ${song.bpm || "?"} BPM</div>`;
+                        grid.appendChild(card);
+                    });
+            }
+
+            document
+                .getElementById("song-audio-file")
+                .addEventListener("change", function (e) {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    if (file.size > 2.5 * 1024 * 1024) {
+                        alert("File too large (>2.5MB)");
+                        this.value = "";
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        tempAudioBase64 = ev.target.result;
+                        tempAudioName = file.name;
+                        document.getElementById("audio-status").textContent =
+                            `Loaded: ${file.name}`;
+                        document.getElementById(
+                            "clear-audio-btn",
+                        ).style.display = "block";
+                    };
+                    reader.readAsDataURL(file);
+                });
+
+            function clearAudioSelection() {
+                tempAudioBase64 = null;
+                tempAudioName = null;
+                document.getElementById("song-audio-file").value = "";
+                document.getElementById("audio-status").textContent = "";
+                document.getElementById("clear-audio-btn").style.display =
+                    "none";
+            }
+
+            function openModal(songId = null) {
+                document
+                    .getElementById("song-modal")
+                    .classList.remove("hidden");
+                clearAudioSelection();
+                if (songId) {
+                    const s = state.songs.find((x) => x.id === songId);
+                    document.getElementById("song-id").value = s.id;
+                    document.getElementById("song-title").value = s.title;
+                    document.getElementById("song-band").value = s.band || "";
+                    document.getElementById("song-key").value = s.key || "";
+                    document.getElementById("song-time").value = s.time || "";
+                    document.getElementById("song-bpm").value = s.bpm || "";
+                    document.getElementById("song-lyrics").value =
+                        s.lyrics || "";
+                    if (s.audioBase64) {
+                        tempAudioBase64 = s.audioBase64;
+                        tempAudioName = s.audioName;
+                        document.getElementById("audio-status").textContent =
+                            `Current: ${s.audioName}`;
+                        document.getElementById(
+                            "clear-audio-btn",
+                        ).style.display = "block";
+                    }
+                } else {
+                    document.getElementById("song-id").value = "";
+                    document.getElementById("song-title").value = "";
+                    document.getElementById("song-band").value = "";
+                    document.getElementById("song-lyrics").value = "";
+                }
+            }
+
+            function closeModal() {
+                document.getElementById("song-modal").classList.add("hidden");
+            }
+
+            function saveSong() {
+                const id =
+                    document.getElementById("song-id").value ||
+                    Date.now().toString();
+                const song = {
+                    id,
+                    title: document.getElementById("song-title").value,
+                    band: document.getElementById("song-band").value,
+                    key: document.getElementById("song-key").value,
+                    time: document.getElementById("song-time").value,
+                    bpm: document.getElementById("song-bpm").value,
+                    lyrics: document.getElementById("song-lyrics").value,
+                    audioBase64: tempAudioBase64,
+                    audioName: tempAudioName,
+                };
+                if (!song.title) return alert("Title required");
+                const idx = state.songs.findIndex((s) => s.id === id);
+                idx > -1 ? (state.songs[idx] = song) : state.songs.push(song);
+                saveData();
+                renderLibrary();
+                renderSetlistSource();
+                renderActiveSetlist();
+                closeModal();
+                if (
+                    document
+                        .getElementById("view-lyric")
+                        .classList.contains("active")
+                )
+                    viewSong(id);
+            }
+
+            function deleteSong() {
+                if (!confirm("Delete song?")) return;
+                const id = document.getElementById("song-id").value;
+                state.songs = state.songs.filter((s) => s.id !== id);
+                state.setlists.forEach(
+                    (sl) =>
+                        (sl.songIds = sl.songIds.filter((sid) => sid !== id)),
+                );
+                saveData();
+                renderLibrary();
+                renderSetlistSource();
+                renderActiveSetlist();
+                closeModal();
                 navigate("library");
             }
-        }
 
-        function toggleTheme() {
-            state.theme = state.theme === "dark" ? "light" : "dark";
-            applyTheme(state.theme);
-            saveData();
-        }
-
-        function applyTheme(theme) {
-            // Modifying the body attribute applies the CSS overrides defined in the <style> block
-            document.body.setAttribute("data-theme", theme);
-            document.getElementById("theme-toggle").textContent = theme === "dark" ? "☀️ Light" : "🌙 Dark";
-        }
-
-        // ==========================================
-        // LIBRARY & CRUD (Create, Read, Update, Delete)
-        // ==========================================
-        function renderLibrary() {
-            const grid = document.getElementById("song-grid");
-            grid.innerHTML = ""; // Clear existing grid
-
-            const searchInput = document.getElementById("search-bar");
-            const searchTerm = searchInput ? searchInput.value.toLowerCase() : "";
-
-            // Filter songs based on search text (title, band, or lyrics)
-            const filteredSongs = state.songs.filter((song) => {
-                return (
-                    song.title.toLowerCase().includes(searchTerm) ||
-                    (song.band && song.band.toLowerCase().includes(searchTerm)) ||
-                    (song.lyrics && song.lyrics.toLowerCase().includes(searchTerm))
-                );
-            });
-
-            if (filteredSongs.length === 0) {
-                grid.innerHTML = '<p class="empty-state">No songs found. Try adjusting your search or add a new song!</p>';
-                return;
-            }
-
-            // Create a visual card for every song in the filtered list
-            filteredSongs.forEach((song) => {
-                const card = document.createElement("div");
-                card.className = "card";
-                card.onclick = () => {
-                    isPlayingSetlist = false; // We clicked from library, not a setlist
-                    viewSong(song.id);
-                };
-
-                const title = document.createElement("h3");
-                title.textContent = song.title;
-
-                const bpmString = song.bpm ? ` • ${song.bpm} BPM` : "";
-                const meta = document.createElement("div");
-                meta.className = "card-meta";
-                meta.textContent = `${song.band || "Unknown Artist"} • Key: ${song.key || "N/A"}${bpmString}`;
-
-                card.appendChild(title);
-                card.appendChild(meta);
-                grid.appendChild(card);
-            });
-        }
-
-        function openModal(songId = null) {
-            document.getElementById("song-modal").classList.remove("hidden");
-
-            // If we pass an ID, we are editing. If null, we are creating a new song.
-            document.getElementById("delete-btn").style.display = songId ? "block" : "none";
-
-            if (songId) {
-                const song = state.songs.find((s) => s.id === songId);
-                document.getElementById("song-id").value = song.id;
-                document.getElementById("song-title").value = song.title;
-                document.getElementById("song-band").value = song.band || "";
-                document.getElementById("song-key").value = song.key || "";
-                document.getElementById("song-time").value = song.time || "";
-                document.getElementById("song-bpm").value = song.bpm || "";
-                document.getElementById("song-lyrics").value = song.lyrics || "";
-                document.getElementById("modal-title").textContent = "Edit Song";
-            } else {
-                // Clear all fields for a fresh form
-                document.getElementById("song-id").value = "";
-                document.getElementById("song-title").value = "";
-                document.getElementById("song-band").value = "";
-                document.getElementById("song-key").value = "";
-                document.getElementById("song-time").value = "";
-                document.getElementById("song-bpm").value = "";
-                document.getElementById("song-lyrics").value = "";
-                document.getElementById("modal-title").textContent = "Add New Song";
-            }
-        }
-
-        function closeModal() {
-            document.getElementById("song-modal").classList.add("hidden");
-        }
-
-        function saveSong() {
-            // Generate a unique ID using current timestamp if new
-            const id = document.getElementById("song-id").value || Date.now().toString();
-
-            const newSong = {
-                id: id,
-                title: document.getElementById("song-title").value,
-                band: document.getElementById("song-band").value,
-                key: document.getElementById("song-key").value,
-                time: document.getElementById("song-time").value,
-                bpm: document.getElementById("song-bpm").value,
-                lyrics: document.getElementById("song-lyrics").value,
-            };
-
-            if (!newSong.title) return alert("Title is required!");
-
-            // Check if song exists to update, otherwise add it
-            const existingIndex = state.songs.findIndex((s) => s.id === id);
-            if (existingIndex > -1) {
-                state.songs[existingIndex] = newSong;
-            } else {
-                state.songs.push(newSong);
-            }
-
-            saveData();
-
-            // Clear search to show newly added song
-            const searchInput = document.getElementById("search-bar");
-            if (searchInput) searchInput.value = "";
-
-            renderLibrary();
-            renderSetlistSource();
-            renderActiveSetlist();
-            closeModal();
-
-            // If we edited a song while looking at its lyrics, refresh the view
-            if (document.getElementById("view-lyric").classList.contains("active")) {
-                viewSong(id);
-            }
-        }
-
-        function deleteSong() {
-            if (!confirm("Are you sure you want to delete this song?")) return;
-
-            const id = document.getElementById("song-id").value;
-
-            // Remove from global library
-            state.songs = state.songs.filter((s) => s.id !== id);
-
-            // Important: We must also scrub the deleted song's ID out of all setlists
-            state.setlists.forEach((setlist) => {
-                setlist.songIds = setlist.songIds.filter((sId) => sId !== id);
-            });
-
-            saveData();
-            renderLibrary();
-            renderSetlistSource();
-            renderActiveSetlist();
-            closeModal();
-            navigate("library");
-        }
-
-        // ==========================================
-        // LYRIC VIEW, NAV & AUTO-SCROLL
-        // ==========================================
-        function viewSong(id) {
-            currentSongId = id;
-            const song = state.songs.find((s) => s.id === id);
-            if (!song) return;
-
-            // Populate text
-            document.getElementById("detail-title").textContent = song.title;
-            const bpmStr = song.bpm ? ` • ${song.bpm} BPM` : "";
-            document.getElementById("detail-meta").textContent =
-                `${song.band || "Unknown"} • Key: ${song.key || "-"} • Time: ${song.time || "-"}${bpmStr}`;
-            document.getElementById("detail-lyrics").textContent = song.lyrics;
-
-            // Handle Setlist Navigation UI (Prev/Next buttons)
-            const navContainer = document.getElementById("setlist-nav");
-            if (isPlayingSetlist) {
-                navContainer.style.display = "flex";
-                const activeSL = getActiveSetlist();
-                document.getElementById("setlist-progress").textContent =
-                    `${currentPlayingIndex + 1} / ${activeSL.songIds.length}`;
-
-                // Disable 'Prev' if on the first song, disable 'Next' if on the last song
-                document.getElementById("btn-prev").disabled = currentPlayingIndex === 0;
-                document.getElementById("btn-next").disabled = currentPlayingIndex === activeSL.songIds.length - 1;
-            } else {
-                navContainer.style.display = "none";
-            }
-
-            // Metronome Setup
-            currentSongBpm = song.bpm;
-            stopMetronome();
-            const metroBtn = document.getElementById("metronome-btn");
-            if (metroBtn) {
-                // Show metronome button only if there is a valid BPM
-                if (song.bpm && !isNaN(song.bpm)) {
-                    metroBtn.style.display = "inline-block";
-                } else {
-                    metroBtn.style.display = "none";
-                }
-            }
-
-            navigate("lyric");
-        }
-
-        function navigateSetlist(direction) {
-            const activeSL = getActiveSetlist();
-            const newIndex = currentPlayingIndex + direction;
-
-            // Check bounds so we don't crash
-            if (newIndex >= 0 && newIndex < activeSL.songIds.length) {
-                currentPlayingIndex = newIndex;
-                stopAutoScroll();
-                stopMetronome();
-                viewSong(activeSL.songIds[newIndex]);
-            }
-        }
-
-        function editCurrentSong() {
-            if (currentSongId) openModal(currentSongId);
-        }
-
-        function toggleAutoScroll() {
-            const btn = document.getElementById("scroll-btn");
-            if (autoScrollInterval) {
-                stopAutoScroll();
-            } else {
-                btn.textContent = "Pause Auto-Scroll";
-                // Scrolls window down 1 pixel every 30 milliseconds
-                autoScrollInterval = setInterval(() => window.scrollBy(0, 1), 30);
-            }
-        }
-
-        function stopAutoScroll() {
-            clearInterval(autoScrollInterval);
-            autoScrollInterval = null;
-            document.getElementById("scroll-btn").textContent = "Play Auto-Scroll";
-        }
-
-        // ==========================================
-        // MULTIPLE SETLISTS MANAGER
-        // ==========================================
-        function updateSetlistDropdown() {
-            const selector = document.getElementById("setlist-selector");
-            selector.innerHTML = "";
-            state.setlists.forEach((sl) => {
-                const opt = document.createElement("option");
-                opt.value = sl.id;
-                opt.textContent = sl.name;
-                if (sl.id === state.activeSetlistId) opt.selected = true;
-                selector.appendChild(opt);
-            });
-        }
-
-        function changeActiveSetlist() {
-            state.activeSetlistId = document.getElementById("setlist-selector").value;
-            saveData();
-            renderActiveSetlist();
-        }
-
-        function createNewSetlist() {
-            const name = prompt("Enter a name for the new setlist:");
-            if (!name) return;
-
-            const newId = "set_" + Date.now();
-            state.setlists.push({ id: newId, name: name, songIds: [] });
-            state.activeSetlistId = newId;
-
-            saveData();
-            updateSetlistDropdown();
-            renderActiveSetlist();
-        }
-
-        function deleteActiveSetlist() {
-            if (state.setlists.length <= 1) return alert("You must have at least one setlist.");
-            if (!confirm("Delete setlist? (Songs will remain in your library)")) return;
-
-            state.setlists = state.setlists.filter((sl) => sl.id !== state.activeSetlistId);
-            state.activeSetlistId = state.setlists[0].id; // Fallback to the first available setlist
-
-            saveData();
-            updateSetlistDropdown();
-            renderActiveSetlist();
-        }
-
-        function getActiveSetlist() {
-            return state.setlists.find((sl) => sl.id === state.activeSetlistId);
-        }
-
-        function playActiveSetlist() {
-            const activeSL = getActiveSetlist();
-            if (!activeSL || activeSL.songIds.length === 0) {
-                return alert("Add some songs to the setlist first!");
-            }
-
-            isPlayingSetlist = true;
-            currentPlayingIndex = 0;
-            viewSong(activeSL.songIds[0]);
-        }
-
-        // ==========================================
-        // DRAG, DROP & REARRANGE
-        // ==========================================
-        function renderSetlistSource() {
-            const source = document.getElementById("drag-source");
-            source.innerHTML = "";
-
-            state.songs.forEach((song) => {
-                const li = document.createElement("li");
-                li.className = "song-list-item draggable";
-                li.draggable = true;
-
-                // When dragging starts, attach the song ID to the drag event
-                li.ondragstart = (e) => e.dataTransfer.setData("text/plain", song.id);
-
-                const titleSpan = document.createElement("span");
-                titleSpan.textContent = `${song.title} - ${song.band || "Unknown"}`;
-
-                // Fallback '+' button for users who don't want to drag
-                const addBtn = document.createElement("button");
-                addBtn.textContent = "+";
-                addBtn.className = "icon-btn primary-btn";
-                addBtn.onclick = () => addSongToSetlist(song.id);
-
-                li.appendChild(titleSpan);
-                li.appendChild(addBtn);
-                source.appendChild(li);
-            });
-        }
-
-        function renderActiveSetlist() {
-            const target = document.getElementById("drop-target");
-            target.innerHTML = "";
-
-            const activeSL = getActiveSetlist();
-            if (!activeSL) return;
-
-            activeSL.songIds.forEach((id, index) => {
+            function viewSong(id) {
+                currentSongId = id;
                 const song = state.songs.find((s) => s.id === id);
-                if (song) {
-                    const li = document.createElement("li");
-                    li.className = "song-list-item";
+                if (!song) return;
+                document.getElementById("detail-title").textContent =
+                    song.title;
+                document.getElementById("detail-meta").textContent =
+                    `${song.band || "Unknown"} • Key: ${song.key || "-"} • Time: ${song.time || "-"} • ${song.bpm || "-"} BPM`;
+                document.getElementById("detail-lyrics").textContent =
+                    song.lyrics;
 
-                    const titleSpan = document.createElement("span");
-                    titleSpan.textContent = `${index + 1}. ${song.title}`;
-                    titleSpan.style.cursor = "pointer";
-                    // Clicking a song here jumps directly into playing the setlist from this index
-                    titleSpan.onclick = () => {
-                        isPlayingSetlist = true;
-                        currentPlayingIndex = index;
-                        viewSong(song.id);
-                    };
-
-                    const actions = document.createElement("div");
-                    actions.className = "item-actions";
-                    actions.style.display = "flex";
-                    actions.style.gap = "4px";
-
-                    const upBtn = document.createElement("button");
-                    upBtn.innerHTML = "▲";
-                    upBtn.className = "icon-btn";
-                    upBtn.onclick = () => moveInSetlist(index, -1);
-
-                    const downBtn = document.createElement("button");
-                    downBtn.innerHTML = "▼";
-                    downBtn.className = "icon-btn";
-                    downBtn.onclick = () => moveInSetlist(index, 1);
-
-                    const remBtn = document.createElement("button");
-                    remBtn.innerHTML = "✖";
-                    remBtn.className = "icon-btn danger-btn";
-                    remBtn.onclick = () => removeFromSetlist(index);
-
-                    actions.appendChild(upBtn);
-                    actions.appendChild(downBtn);
-                    actions.appendChild(remBtn);
-                    li.appendChild(titleSpan);
-                    li.appendChild(actions);
-                    target.appendChild(li);
+                const ac = document.getElementById("audio-player-container"),
+                    ap = document.getElementById("audio-player");
+                if (song.audioBase64) {
+                    ac.style.display = "block";
+                    document.getElementById("audio-player-label").textContent =
+                        "🎵 " + song.audioName;
+                    ap.src = song.audioBase64;
+                } else {
+                    ac.style.display = "none";
+                    ap.pause();
+                    ap.src = "";
                 }
-            });
-        }
 
-        function addSongToSetlist(songId) {
-            getActiveSetlist().songIds.push(songId);
-            saveData();
-            renderActiveSetlist();
-        }
+                const sn = document.getElementById("setlist-nav");
+                if (isPlayingSetlist) {
+                    sn.style.display = "flex";
+                    const sl = getActiveSetlist();
+                    document.getElementById("setlist-progress").textContent =
+                        `${currentPlayingIndex + 1} / ${sl.songIds.length}`;
+                    document.getElementById("btn-prev").disabled =
+                        currentPlayingIndex === 0;
+                    document.getElementById("btn-next").disabled =
+                        currentPlayingIndex === sl.songIds.length - 1;
+                } else sn.style.display = "none";
 
-        function moveInSetlist(index, direction) {
-            const activeSL = getActiveSetlist();
-
-            // Ensure we aren't moving off the edge of the array
-            if (index + direction < 0 || index + direction >= activeSL.songIds.length) return;
-
-            // Swap items
-            const temp = activeSL.songIds[index];
-            activeSL.songIds[index] = activeSL.songIds[index + direction];
-            activeSL.songIds[index + direction] = temp;
-
-            saveData();
-            renderActiveSetlist();
-        }
-
-        function removeFromSetlist(index) {
-            getActiveSetlist().songIds.splice(index, 1);
-            saveData();
-            renderActiveSetlist();
-        }
-
-        // HTML5 Drag and Drop event bindings
-        const dropzone = document.getElementById("drop-target");
-        dropzone.ondragover = (e) => {
-            e.preventDefault(); // Required to allow dropping
-            dropzone.classList.add("drag-over");
-        };
-        dropzone.ondragleave = () => dropzone.classList.remove("drag-over");
-        dropzone.ondrop = (e) => {
-            e.preventDefault();
-            dropzone.classList.remove("drag-over");
-
-            // Retrieve the ID we attached in ondragstart
-            const songId = e.dataTransfer.getData("text/plain");
-            if (songId) addSongToSetlist(songId);
-        };
-
-        // ==========================================
-        // AUDIO METRONOME (Web Audio API)
-        // ==========================================
-        // Browsers require a user interaction (like a click) before audio can play.
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        }
-
-        function playClick() {
-            // --- AUDIO LOGIC ---
-            const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-
-            osc.frequency.value = 800; // Pitch of the beep
-            osc.type = "sine";
-
-            // Fast attack and exponential decay creates a "click" instead of a long beep
-            gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-
-            osc.start(audioCtx.currentTime);
-            osc.stop(audioCtx.currentTime + 0.1);
-
-            // --- VISUAL LOGIC ---
-            const btn = document.getElementById("metronome-btn");
-            if (btn) {
-                // Trick to restart a CSS animation instantly
-                btn.classList.remove("flash-beat");
-                void btn.offsetWidth; // Force DOM reflow
-                btn.classList.add("flash-beat");
-            }
-        }
-
-        function toggleMetronome() {
-            if (isMetronomePlaying) {
+                currentSongBpm = song.bpm;
                 stopMetronome();
-            } else {
-                if (!currentSongBpm || isNaN(currentSongBpm)) {
-                    return alert("No valid BPM set for this song!");
-                }
-                initAudio();
-                isMetronomePlaying = true;
-                document.getElementById("metronome-btn").textContent = "Stop Metronome ⏹️";
-
-                // Play first click immediately, then calculate the ms interval for the rest
-                playClick();
-                const intervalMs = 60000 / parseInt(currentSongBpm);
-                metronomeInterval = setInterval(playClick, intervalMs);
+                const mb = document.getElementById("metronome-btn");
+                mb.style.display =
+                    song.bpm && !isNaN(song.bpm) ? "inline-block" : "none";
+                navigate("lyric");
             }
-        }
 
-        function stopMetronome() {
-            isMetronomePlaying = false;
-            clearInterval(metronomeInterval);
-            metronomeInterval = null;
-            const btn = document.getElementById("metronome-btn");
-            if (btn) btn.textContent = "Play Metronome ▶️";
-        }
-
-        // ==========================================
-        // IMPORT / EXPORT (JSON)
-        // ==========================================
-        function exportData() {
-            // Adding `null, 4` to JSON.stringify formats it with 4 spaces for human readability
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 4));
-
-            const downloadAnchorNode = document.createElement("a");
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "gigmaster-data.json");
-            document.body.appendChild(downloadAnchorNode);
-            downloadAnchorNode.click();
-            downloadAnchorNode.remove();
-        }
-
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                try {
-                    const importedState = JSON.parse(e.target.result);
-                    // Minimal validation to ensure it's the right kind of file
-                    if (importedState.songs) {
-                        state = importedState;
-                        saveData();
-                        loadData();
-                        alert("Data imported successfully!");
-                    } else {
-                        alert("Invalid file structure.");
-                    }
-                } catch (err) {
-                    alert("Error importing file. Make sure it's a valid JSON.");
+            function navigateSetlist(dir) {
+                const sl = getActiveSetlist();
+                const next = currentPlayingIndex + dir;
+                if (next >= 0 && next < sl.songIds.length) {
+                    currentPlayingIndex = next;
+                    viewSong(sl.songIds[next]);
                 }
+            }
+
+            function editCurrentSong() {
+                if (currentSongId) openModal(currentSongId);
+            }
+
+            function toggleAutoScroll() {
+                const b = document.getElementById("scroll-btn");
+                if (autoScrollInterval) {
+                    clearInterval(autoScrollInterval);
+                    autoScrollInterval = null;
+                    b.textContent = "Auto-Scroll";
+                } else {
+                    b.textContent = "Stop Scroll";
+                    autoScrollInterval = setInterval(
+                        () => window.scrollBy(0, 1),
+                        30,
+                    );
+                }
+            }
+
+            function stopAutoScroll() {
+                if (autoScrollInterval) toggleAutoScroll();
+            }
+
+            function updateSetlistDropdown() {
+                const sel = document.getElementById("setlist-selector");
+                sel.innerHTML = "";
+                state.setlists.forEach((sl) => {
+                    const opt = document.createElement("option");
+                    opt.value = sl.id;
+                    opt.textContent = sl.name;
+                    if (sl.id === state.activeSetlistId) opt.selected = true;
+                    sel.appendChild(opt);
+                });
+            }
+
+            function changeActiveSetlist() {
+                state.activeSetlistId =
+                    document.getElementById("setlist-selector").value;
+                saveData();
+                renderActiveSetlist();
+            }
+            function createNewSetlist() {
+                const n = prompt("Name:");
+                if (n) {
+                    const id = "s" + Date.now();
+                    state.setlists.push({ id, name: n, songIds: [] });
+                    state.activeSetlistId = id;
+                    saveData();
+                    updateSetlistDropdown();
+                    renderActiveSetlist();
+                }
+            }
+            function deleteActiveSetlist() {
+                if (state.setlists.length > 1 && confirm("Delete?")) {
+                    state.setlists = state.setlists.filter(
+                        (sl) => sl.id !== state.activeSetlistId,
+                    );
+                    state.activeSetlistId = state.setlists[0].id;
+                    saveData();
+                    updateSetlistDropdown();
+                    renderActiveSetlist();
+                }
+            }
+            function getActiveSetlist() {
+                return state.setlists.find(
+                    (sl) => sl.id === state.activeSetlistId,
+                );
+            }
+            function playActiveSetlist() {
+                const sl = getActiveSetlist();
+                if (sl.songIds.length) {
+                    isPlayingSetlist = true;
+                    currentPlayingIndex = 0;
+                    viewSong(sl.songIds[0]);
+                }
+            }
+
+            function renderSetlistSource() {
+                const src = document.getElementById("drag-source");
+                src.innerHTML = "";
+                state.songs.forEach((s) => {
+                    const li = document.createElement("li");
+                    li.className = "song-list-item draggable";
+                    li.draggable = true;
+                    li.ondragstart = (e) =>
+                        e.dataTransfer.setData("text", s.id);
+                    li.innerHTML = `<span>${s.title}</span> <button onclick="addSongToSetlist('${s.id}')">+</button>`;
+                    src.appendChild(li);
+                });
+            }
+
+            function renderActiveSetlist() {
+                const target = document.getElementById("drop-target");
+                target.innerHTML = "";
+                const sl = getActiveSetlist();
+                sl.songIds.forEach((id, idx) => {
+                    const s = state.songs.find((x) => x.id === id);
+                    if (s) {
+                        const li = document.createElement("li");
+                        li.className = "song-list-item";
+                        li.innerHTML = `<span onclick="isPlayingSetlist=true; currentPlayingIndex=${idx}; viewSong('${id}')">${idx + 1}. ${s.title}</span>
+                                    <div><button onclick="moveInSetlist(${idx},-1)">▲</button><button onclick="moveInSetlist(${idx},1)">▼</button><button onclick="removeFromSetlist(${idx})">✖</button></div>`;
+                        target.appendChild(li);
+                    }
+                });
+            }
+
+            function addSongToSetlist(id) {
+                getActiveSetlist().songIds.push(id);
+                saveData();
+                renderActiveSetlist();
+            }
+            function moveInSetlist(idx, dir) {
+                const sl = getActiveSetlist();
+                if (idx + dir >= 0 && idx + dir < sl.songIds.length) {
+                    [sl.songIds[idx], sl.songIds[idx + dir]] = [
+                        sl.songIds[idx + dir],
+                        sl.songIds[idx],
+                    ];
+                    saveData();
+                    renderActiveSetlist();
+                }
+            }
+            function removeFromSetlist(idx) {
+                getActiveSetlist().songIds.splice(idx, 1);
+                saveData();
+                renderActiveSetlist();
+            }
+
+            const dz = document.getElementById("drop-target");
+            dz.ondragover = (e) => {
+                e.preventDefault();
+                dz.classList.add("drag-over");
             };
-            reader.readAsText(file);
+            dz.ondragleave = () => dz.classList.remove("drag-over");
+            dz.ondrop = (e) => {
+                e.preventDefault();
+                dz.classList.remove("drag-over");
+                const id = e.dataTransfer.getData("text");
+                if (id) addSongToSetlist(id);
+            };
 
-            // Clear input so you can import the same file twice if needed
-            event.target.value = "";
-        }
+            function initAudio() {
+                if (!audioCtx)
+                    audioCtx = new (
+                        window.AudioContext || window.webkitAudioContext
+                    )();
+                if (audioCtx.state === "suspended") audioCtx.resume();
+            }
+            function playClick() {
+                const osc = audioCtx.createOscillator();
+                const g = audioCtx.createGain();
+                osc.connect(g);
+                g.connect(audioCtx.destination);
+                osc.frequency.value = 800;
+                g.gain.setValueAtTime(1, audioCtx.currentTime);
+                g.gain.exponentialRampToValueAtTime(
+                    0.001,
+                    audioCtx.currentTime + 0.1,
+                );
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+                const b = document.getElementById("metronome-btn");
+                b.classList.remove("flash-beat");
+                void b.offsetWidth;
+                b.classList.add("flash-beat");
+            }
+            function toggleMetronome() {
+                if (isMetronomePlaying) stopMetronome();
+                else {
+                    initAudio();
+                    isMetronomePlaying = true;
+                    document.getElementById("metronome-btn").textContent =
+                        "Stop ⏹️";
+                    playClick();
+                    metronomeInterval = setInterval(
+                        playClick,
+                        60000 / currentSongBpm,
+                    );
+                }
+            }
+            function stopMetronome() {
+                isMetronomePlaying = false;
+                clearInterval(metronomeInterval);
+                metronomeInterval = null;
+                const b = document.getElementById("metronome-btn");
+                if (b) b.textContent = "Metronome ▶️";
+            }
 
-        // ==========================================
-        // INITIALIZE APP ON LOAD
-        // ==========================================
-        loadData();
+            function exportData() {
+                const blob = new Blob([JSON.stringify(state, null, 4)], {
+                    type: "application/json",
+                });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "gigmaster-backup.json";
+                a.click();
+            }
 
-    </script>
-</body>
+            function importData(e) {
+                const f = e.target.files[0];
+                if (!f) return;
+                const r = new FileReader();
+                r.onload = (ev) => {
+                    state = JSON.parse(ev.target.result);
+                    saveData();
+                    loadData();
+                    alert("Imported!");
+                };
+                r.readAsText(f);
+            }
+
+            loadData();
+        </script>
+    </body>
 </html>
