@@ -3,7 +3,7 @@
   <h1>Gigmaster</h1>
   <p><strong>A simple, self-hosted lyrics library without dependenvies.</strong></p>
 
-  ![Version](https://img.shields.io/badge/version-2026.05.29-blue?style=flat-square)
+  ![Version](https://img.shields.io/badge/version-2026.05.02-blue?style=flat-square)
 </div>
 
 ---
@@ -13,9 +13,12 @@
 **Gigmaster** is a lightweight, responsive web application designed to manage and display lyrics during gigs or rehearsals. It is built to be self-hosted and uses a simple flat-file structure. My goal was to make it as simple as possible so no external frameworks are used, only pure HTML, CSS and javascript.
 
 ### Features
-* **Dark Mode UI:** Optimized for low-light stage environments.
+* **Light and Dark Mode UI:** Optimized for low-light stage environments.
 * **Card Grid Layout:** Easy touch navigation for song selection.
 * **Flat-File structure:** Lyrics are stored inside `localStorage` in the Browser and can be imported / exported as JSON. The application itself is just one html file containing everything.
+
+<img src="screenshots/main-page-dark.PNG" alt="main-page-dark" width="600"/>
+<img src="screenshots/main-page-light.PNG" alt="main-page-light" width="600"/>
 
 
 ---
