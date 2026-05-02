@@ -39,16 +39,19 @@ If you want to host it with Nginx, Apache or something else.
 
 You can drag and  songs via the **"Add Song"** button in the **Library** tab, or by importing from the JSON.
 
+<img src="screenshots/add-song-ui.PNG" alt="main-page-light" width="200"/>
+
 ## Adding Setlists
 
 There is a default Setlist that can be edited. New ones can be added and also removed. The "Play Setlist" feature displays Songs in order and allows switching to the previous/next one.
+
+<img src="screenshots/setlist-ui.PNG" alt="main-page-light" width="600"/>
 
 ---
 
 ## TODO
 
 - toggle audio click on/off, keep visual
-- backing track playback (if possible)
 
 ## Nice to have
 
