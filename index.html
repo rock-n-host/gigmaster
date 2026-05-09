@@ -436,8 +436,8 @@
 
                 <div style="display: flex; gap: 12px">
                     <div style="flex: 1">
-                        <label>Key</label>
-                        <input type="text" id="song-key" />
+                        <label>Tune</label>
+                        <input type="text" id="song-tune" />
                     </div>
                     <div style="flex: 1">
                         <label>Time Sig</label>
@@ -453,7 +453,7 @@
                     </div>
                 </div>
 
-                <label>Audio Sample (Max 2.5MB)</label>
+                <label>Audio Sample (Max 25MB)</label>
                 <div
                     style="
                         display: flex;
@@ -531,18 +531,96 @@
             let tempAudioBase64 = null,
                 tempAudioName = null;
 
-            function loadData() {
-                const saved = localStorage.getItem("GigmasterState");
-                if (saved) state = JSON.parse(saved);
-                applyTheme(state.theme);
-                renderLibrary();
-                updateSetlistDropdown();
-                renderSetlistSource();
-                renderActiveSetlist();
+            // ==========================================
+            // INDEXED-DB STORAGE ENGINE
+            // ==========================================
+            const DB_NAME = "GigmasterDB";
+            const STORE_NAME = "stateStore";
+
+            // 1. Initialize the Database
+            function openDB() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open(DB_NAME, 1);
+
+                    request.onupgradeneeded = (e) => {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains(STORE_NAME)) {
+                            db.createObjectStore(STORE_NAME);
+                        }
+                    };
+
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
             }
 
-            function saveData() {
-                localStorage.setItem("GigmasterState", JSON.stringify(state));
+            // 2. Save Data (Asynchronous)
+            async function saveData() {
+                try {
+                    const db = await openDB();
+                    return new Promise((resolve, reject) => {
+                        const tx = db.transaction(STORE_NAME, "readwrite");
+                        const store = tx.objectStore(STORE_NAME);
+                        store.put(state, "appState"); // We store the whole state object under one key
+
+                        tx.oncomplete = () => resolve();
+                        tx.onerror = () => reject(tx.error);
+                    });
+                } catch (err) {
+                    console.error("Failed to save to database:", err);
+                }
+            }
+
+            // 3. Load Data & Auto-Migrate
+            async function loadData() {
+                try {
+                    const db = await openDB();
+                    const savedState = await new Promise((resolve, reject) => {
+                        const tx = db.transaction(STORE_NAME, "readonly");
+                        const store = tx.objectStore(STORE_NAME);
+                        const request = store.get("appState");
+
+                        request.onsuccess = () => resolve(request.result);
+                        request.onerror = () => reject(request.error);
+                    });
+
+                    if (savedState) {
+                        // Load from IndexedDB
+                        state = savedState;
+                    } else {
+                        // MIGRATION: If DB is empty, check old localStorage
+                        const oldLocal = localStorage.getItem("GigmasterState");
+                        if (oldLocal) {
+                            console.log(
+                                "Migrating data from localStorage to IndexedDB...",
+                            );
+                            state = JSON.parse(oldLocal);
+                            await saveData(); // Save it into IndexedDB immediately
+                        }
+                    }
+
+                    // Safety check for setlists
+                    if (!state.setlists || state.setlists.length === 0) {
+                        state.setlists = [
+                            {
+                                id: "default",
+                                name: "My First Setlist",
+                                songIds: [],
+                            },
+                        ];
+                        state.activeSetlistId = "default";
+                    }
+
+                    applyTheme(state.theme);
+                    renderLibrary();
+                    updateSetlistDropdown();
+                    renderSetlistSource();
+                    renderActiveSetlist();
+                } catch (err) {
+                    console.error("Failed to load from database:", err);
+                    // Fallback rendering just in case DB fails completely
+                    renderLibrary();
+                }
             }
 
             function navigate(viewId) {
@@ -598,7 +676,7 @@
                             viewSong(song.id);
                         };
                         card.innerHTML = `<h3>${song.title}${song.audioBase64 ? " 🎵" : ""}</h3>
-                                      <div class="card-meta">${song.band || "Artist"} • Key: ${song.key || "N/A"} • ${song.bpm || "?"} BPM</div>`;
+                            <div class="card-meta">${song.band || "Artist"} • Tune: ${song.tune || "N/A"} • ${song.bpm || "?"} BPM</div>`;
                         grid.appendChild(card);
                     });
             }
@@ -608,8 +686,8 @@
                 .addEventListener("change", function (e) {
                     const file = e.target.files[0];
                     if (!file) return;
-                    if (file.size > 2.5 * 1024 * 1024) {
-                        alert("File too large (>2.5MB)");
+                    if (file.size > 25 * 1024 * 1024) {
+                        alert("File too large (>25MB)");
                         this.value = "";
                         return;
                     }
@@ -645,7 +723,7 @@
                     document.getElementById("song-id").value = s.id;
                     document.getElementById("song-title").value = s.title;
                     document.getElementById("song-band").value = s.band || "";
-                    document.getElementById("song-key").value = s.key || "";
+                    document.getElementById("song-tune").value = s.tune || "";
                     document.getElementById("song-time").value = s.time || "";
                     document.getElementById("song-bpm").value = s.bpm || "";
                     document.getElementById("song-lyrics").value =
@@ -679,7 +757,7 @@
                     id,
                     title: document.getElementById("song-title").value,
                     band: document.getElementById("song-band").value,
-                    key: document.getElementById("song-key").value,
+                    tune: document.getElementById("song-tune").value,
                     time: document.getElementById("song-time").value,
                     bpm: document.getElementById("song-bpm").value,
                     lyrics: document.getElementById("song-lyrics").value,
@@ -725,7 +803,7 @@
                 document.getElementById("detail-title").textContent =
                     song.title;
                 document.getElementById("detail-meta").textContent =
-                    `${song.band || "Unknown"} • Key: ${song.key || "-"} • Time: ${song.time || "-"} • ${song.bpm || "-"} BPM`;
+                    `${song.band || "Unknown"} • Tune: ${song.tune || "-"} • Time: ${song.time || "-"} • ${song.bpm || "-"} BPM`;
                 document.getElementById("detail-lyrics").textContent =
                     song.lyrics;
 
