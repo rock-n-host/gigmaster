@@ -15,7 +15,10 @@
 ### Features
 * **Light and Dark Mode UI:** Optimized for low-light environments as well as outdoor places with daylight.
 * **Card Grid Layout:** Easy touch navigation for song selection.
-* **Flat-File structure:** Lyrics are stored inside `localStorage` in the Browser and can be imported / exported as JSON. The application itself is just one html file containing everything.
+* **Flat-File structure:** Lyrics are stored inside `indexedDB` in the Browser and can be imported / exported as JSON. The application itself is just one html file containing everything.
+
+<img src="screenshots/main-page-dark.PNG" alt="main-page-dark" width="600"/>
+<img src="screenshots/main-page-light.PNG" alt="main-page-light" width="600"/>
 
 <img src="screenshots/main-page-dark.PNG" alt="main-page-dark" width="600"/>
 <img src="screenshots/main-page-light.PNG" alt="main-page-light" width="600"/>
@@ -51,14 +54,13 @@ There is a default Setlist that can be edited. New ones can be added and also re
 
 ## Audio playback
 
-Loading audio files as backing tracks is supported, but very limited. Audio files can be saved as base64 "Text" into the same JSON. However due to localStorage limitations, **"the library can only take up to 5MB of space"**. I keep that limitation in mind and migrating from localStorage to **"indexedDB"** is planned.
+Loading audio files as backing tracks is also supported. Audio files are stored as base64 "Text" directly in the same JSON. Your browser converts them back to audio in real time.
 
 ---
 
 ## TODO
 
 - toggle audio click on/off, keep visual
-- migrate to indexDB to bypass library size limitations
 
 ## Nice to have
 
