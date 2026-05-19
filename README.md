@@ -21,9 +21,6 @@
 <img src="screenshots/main-page-dark.PNG" alt="main-page-dark" width="600"/>
 <img src="screenshots/main-page-light.PNG" alt="main-page-light" width="600"/>
 
-<img src="screenshots/main-page-dark.PNG" alt="main-page-dark" width="600"/>
-<img src="screenshots/main-page-light.PNG" alt="main-page-light" width="600"/>
-
 
 ---
 
@@ -61,12 +58,7 @@ Loading audio files as backing tracks is also supported. Audio files are stored 
 
 ## TODO
 
-- toggle audio click on/off, keep visual
-
-## Nice to have
-
-- default settings
-- save settings to json
+- centralized DB and json backups inside Docker Containers
 
 ---
 
