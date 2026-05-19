@@ -257,7 +257,8 @@
             }
         </style>
     </head>
-    <body data-theme="dark">
+
+    <body>
         <header>
             <div style="display: flex; align-items: center; gap: 12px">
                 <svg
@@ -273,7 +274,7 @@
                 </svg>
                 <h1 style="margin: 0">Gigmaster</h1>
             </div>
-            <button id="theme-toggle" onclick="toggleTheme()">☀️ Light</button>
+            <button onclick="openSettings()">⚙️ Settings</button>
         </header>
 
         <main>
@@ -510,6 +511,66 @@
             </div>
         </div>
 
+        <!-- SETTINGS MODAL -->
+        <div id="settings-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>App Settings</h2>
+
+                <label>Theme</label>
+                <select id="setting-theme">
+                    <option value="system">Follow System</option>
+                    <option value="dark">Dark Mode</option>
+                    <option value="light">Light Mode</option>
+                </select>
+
+                <label>Auto-Scroll Speed (1 = Slowest, 100 = Fastest)</label>
+                <div style="display: flex; align-items: center; gap: 12px">
+                    <input
+                        type="range"
+                        id="setting-scroll-speed"
+                        min="1"
+                        max="100"
+                        step="1"
+                        style="margin-bottom: 0"
+                    />
+                    <span id="scroll-speed-value" style="width: 40px">50</span>
+                </div>
+                <p class="card-meta">Milliseconds between pixel steps.</p>
+
+                <div style="margin: 20px 0">
+                    <label
+                        style="
+                            display: flex;
+                            align-items: center;
+                            gap: 10px;
+                            cursor: pointer;
+                        "
+                    >
+                        <input
+                            type="checkbox"
+                            id="setting-metronome-click"
+                            style="width: auto; margin-bottom: 0"
+                        />
+                        Enable Audio Click/Flash
+                    </label>
+                </div>
+
+                <div
+                    style="
+                        display: flex;
+                        justify-content: flex-end;
+                        gap: 12px;
+                        margin-top: 24px;
+                    "
+                >
+                    <button onclick="closeSettings()">Cancel</button>
+                    <button onclick="saveSettings()" class="primary-btn">
+                        Save Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <script>
             // State and Logic remain the same as previous functional version
             let state = {
@@ -518,7 +579,11 @@
                     { id: "default", name: "My First Setlist", songIds: [] },
                 ],
                 activeSetlistId: "default",
-                theme: "dark",
+                settings: {
+                    theme: "system",
+                    scrollSpeed: 30,
+                    metronomeEnabled: true,
+                },
             };
             let currentSongId = null,
                 autoScrollInterval = null,
@@ -585,8 +650,15 @@
                     });
 
                     if (savedState) {
-                        // Load from IndexedDB
                         state = savedState;
+                        // Safety check for new settings object
+                        if (!state.settings) {
+                            state.settings = {
+                                theme: "system",
+                                scrollSpeed: 30,
+                                metronomeEnabled: true,
+                            };
+                        }
                     } else {
                         // MIGRATION: If DB is empty, check old localStorage
                         const oldLocal = localStorage.getItem("GigmasterState");
@@ -598,6 +670,7 @@
                             await saveData(); // Save it into IndexedDB immediately
                         }
                     }
+                    applyTheme(state.settings.theme);
 
                     // Safety check for setlists
                     if (!state.setlists || state.setlists.length === 0) {
@@ -651,10 +724,25 @@
             }
 
             function applyTheme(theme) {
-                document.body.setAttribute("data-theme", theme);
-                document.getElementById("theme-toggle").textContent =
-                    theme === "dark" ? "☀️ Light" : "🌙 Dark";
+                let effectiveTheme = theme;
+                if (theme === "system") {
+                    effectiveTheme = window.matchMedia(
+                        "(prefers-color-scheme: dark)",
+                    ).matches
+                        ? "dark"
+                        : "light";
+                }
+                document.body.setAttribute("data-theme", effectiveTheme);
             }
+
+            // Watch for System Theme changes while the app is open
+            window
+                .matchMedia("(prefers-color-scheme: dark)")
+                .addEventListener("change", () => {
+                    if (state.settings.theme === "system") {
+                        applyTheme("system");
+                    }
+                });
 
             function renderLibrary() {
                 const grid = document.getElementById("song-grid");
@@ -861,9 +949,11 @@
                     b.textContent = "Auto-Scroll";
                 } else {
                     b.textContent = "Stop Scroll";
+                    // Invert the speed: Speed 100 = 10ms delay. Speed 1 = 1000ms delay.
+                    const delayMs = 1000 / state.settings.scrollSpeed;
                     autoScrollInterval = setInterval(
                         () => window.scrollBy(0, 1),
-                        30,
+                        delayMs,
                     );
                 }
             }
@@ -999,23 +1089,29 @@
                 if (audioCtx.state === "suspended") audioCtx.resume();
             }
             function playClick() {
-                const osc = audioCtx.createOscillator();
-                const g = audioCtx.createGain();
-                osc.connect(g);
-                g.connect(audioCtx.destination);
-                osc.frequency.value = 800;
-                g.gain.setValueAtTime(1, audioCtx.currentTime);
-                g.gain.exponentialRampToValueAtTime(
-                    0.001,
-                    audioCtx.currentTime + 0.1,
-                );
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.1);
+                // Only play audio if enabled in settings
+                if (state.settings.metronomeEnabled) {
+                    const osc = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    osc.connect(g);
+                    g.connect(audioCtx.destination);
+                    osc.frequency.value = 800;
+                    g.gain.setValueAtTime(1, audioCtx.currentTime);
+                    g.gain.exponentialRampToValueAtTime(
+                        0.001,
+                        audioCtx.currentTime + 0.1,
+                    );
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.1);
+                }
+
+                // Always keep the visual flash for cues
                 const b = document.getElementById("metronome-btn");
                 b.classList.remove("flash-beat");
                 void b.offsetWidth;
                 b.classList.add("flash-beat");
             }
+
             function toggleMetronome() {
                 if (isMetronomePlaying) stopMetronome();
                 else {
@@ -1060,6 +1156,53 @@
                     alert("Imported!");
                 };
                 r.readAsText(f);
+            }
+
+            // --- SETTINGS FUNCTIONS ---
+            function openSettings() {
+                document
+                    .getElementById("settings-modal")
+                    .classList.remove("hidden");
+                document.getElementById("setting-theme").value =
+                    state.settings.theme;
+                document.getElementById("setting-scroll-speed").value =
+                    state.settings.scrollSpeed;
+                document.getElementById("setting-metronome-click").checked =
+                    state.settings.metronomeEnabled;
+
+                // Update the speed label display
+                document.getElementById("scroll-speed-value").textContent =
+                    state.settings.scrollSpeed;
+            }
+
+            // Sync range slider text
+            document
+                .getElementById("setting-scroll-speed")
+                ?.addEventListener("input", (e) => {
+                    document.getElementById("scroll-speed-value").textContent =
+                        e.target.value;
+                });
+
+            function closeSettings() {
+                document
+                    .getElementById("settings-modal")
+                    .classList.add("hidden");
+            }
+
+            async function saveSettings() {
+                state.settings = {
+                    theme: document.getElementById("setting-theme").value,
+                    scrollSpeed: parseInt(
+                        document.getElementById("setting-scroll-speed").value,
+                    ),
+                    metronomeEnabled: document.getElementById(
+                        "setting-metronome-click",
+                    ).checked,
+                };
+
+                applyTheme(state.settings.theme);
+                await saveData();
+                closeSettings();
             }
 
             loadData();
