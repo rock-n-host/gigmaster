@@ -16,6 +16,7 @@
 * **Light and Dark Mode UI:** Optimized for low-light environments as well as outdoor places with daylight.
 * **Card Grid Layout:** Easy touch navigation for song selection.
 * **Flat-File structure:** Lyrics are stored inside `indexedDB` in the Browser and can be imported / exported as JSON. The application itself is just one html file containing everything.
+* **Settings:** Simple settings window for the theme, audio click and scroll speed
 
 <img src="screenshots/main-page-dark.PNG" alt="main-page-dark" width="600"/>
 <img src="screenshots/main-page-light.PNG" alt="main-page-light" width="600"/>
