@@ -21,6 +21,9 @@
 <img src="screenshots/main-page-dark.PNG" alt="main-page-dark" width="600"/>
 <img src="screenshots/main-page-light.PNG" alt="main-page-light" width="600"/>
 
+<img src="screenshots/main-page-dark.PNG" alt="main-page-dark" width="600"/>
+<img src="screenshots/main-page-light.PNG" alt="main-page-light" width="600"/>
+
 
 ---
 

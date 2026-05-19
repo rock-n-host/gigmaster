@@ -4,7 +4,7 @@
             "id": "1775654250709",
             "title": "something",
             "band": "someone",
-            "key": "Drop C",
+            "tune": "Drop C",
             "time": "4/4",
             "bpm": "250",
             "lyrics": "bleh!\nsuffering from Code pain.\nCompilation errors\nHow long unti my Code won't fail?\n..."
@@ -13,7 +13,7 @@
             "id": "1777104655469",
             "title": "rock-n-host",
             "band": "rock-n-host",
-            "key": "E",
+            "tune": "E",
             "time": "4/4",
             "bpm": "160",
             "lyrics": "rock-n-host until our final days\nFree and open source\nWe forever stay\nWe won't bow down\nWe won't obey\nrock-n-host\nuntil our final days!"
@@ -22,7 +22,7 @@
             "id": "1777105496656",
             "title": "Codeflow",
             "band": "rock-n-host",
-            "key": "G",
+            "tune": "G",
             "time": "4/4",
             "bpm": "140",
             "lyrics": "[Verse 1]\nLines drip slow in a midnight glow,\nLogic hums where the soft winds blow,\nEvery function finds its way,\nThrough loops that bend but never sway.\n\n[Pre-Chorus]\nIn the quiet of the machine,\nThere’s a pulse beneath the screen,\nA hidden rhythm, clean and true—\nA stream of thought breaking through.\n\n[Chorus]\nLet it flow, let it run,\nLike a river made of ones,\nEvery error washed away,\nIn the current of the array.\nFeel the surge, watch it grow,\nIn this endless undertow,\nCode is more than what we show—\nIt’s a river, let it flow.\n\n[Verse 2]\nVariables drift like fallen leaves,\nCarried by what the mind believes,\nBranches split but still align,\nIn the art of the grand design.\n\n[Bridge]\nWhen the system starts to break,\nAnd the ground begins to shake,\nTrace the path, rewrite the stream,\nTurn the fault into a dream.\n\n[Chorus]\nLet it flow, wild and free,\nThrough the depths of memory,\nEvery line a part of you,\nEvery build begins anew.\nHear it call from deep below—\nThere’s a truth in what we code…\nNot just logic, not just show—\nIt’s a river. Let it flow."
