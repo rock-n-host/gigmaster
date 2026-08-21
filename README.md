@@ -17,6 +17,7 @@
 * **Card Grid Layout:** Easy touch navigation for song selection.
 * **Flat-File structure:** Lyrics are stored inside `indexedDB` in the Browser and can be imported / exported as JSON. The application itself is just one html file containing everything.
 * **Settings:** Simple settings window for the theme, audio click and scroll speed
+* **Samples view:** Browse and play only the songs with attached audio samples, with search by song or artist.
 
 <img src="screenshots/main-page-dark.PNG" alt="main-page-dark" width="600"/>
 <img src="screenshots/main-page-light.PNG" alt="main-page-light" width="600"/>
@@ -53,6 +54,8 @@ There is a default Setlist that can be edited. New ones can be added and also re
 ## Audio playback
 
 Loading audio files as backing tracks is also supported. Audio files are stored as base64 "Text" directly in the same JSON. Your browser converts them back to audio in real time.
+
+Use the **Samples** tab to quickly audition attached audio without opening the full lyrics view. Starting a sample automatically pauses any other active audio player.
 
 ---
 

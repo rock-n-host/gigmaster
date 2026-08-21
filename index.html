@@ -101,6 +101,32 @@
                 flex-wrap: wrap;
             }
 
+            .view-heading {
+                display: flex;
+                justify-content: space-between;
+                align-items: baseline;
+                gap: 16px;
+                flex-wrap: wrap;
+            }
+
+            .empty-state {
+                grid-column: 1 / -1;
+                padding: 32px 16px;
+                text-align: center;
+                color: var(--text-muted);
+                border: 1px dashed var(--text-muted);
+                border-radius: var(--border-radius);
+            }
+
+            .sample-card {
+                cursor: default;
+            }
+
+            .sample-card audio {
+                width: 100%;
+                margin-top: 16px;
+            }
+
             /* --- BUTTONS & INPUTS --- */
             button {
                 background-color: var(--surface-color);
@@ -255,6 +281,31 @@
             .flash-beat {
                 animation: pulse-beat 0.15s ease-out;
             }
+
+            @media (max-width: 700px) {
+                header,
+                main {
+                    padding-left: 16px;
+                    padding-right: 16px;
+                }
+
+                header h1 {
+                    font-size: 1.35rem;
+                }
+
+                .setlist-container {
+                    flex-direction: column;
+                }
+
+                .lyric-controls {
+                    flex-wrap: wrap;
+                }
+
+                #setlist-nav {
+                    width: 100%;
+                    margin-left: 0 !important;
+                }
+            }
         </style>
     </head>
 
@@ -280,6 +331,7 @@
         <main>
             <div class="main-nav">
                 <button onclick="navigate('library')">📚 Library</button>
+                <button onclick="navigate('samples')">🎧 Samples</button>
                 <button onclick="navigate('setlists')">📋 Setlists</button>
                 <button onclick="openModal()" class="buttonn">
                     ➕ Add Song
@@ -297,6 +349,21 @@
                 >
                     📂 Import Backup
                 </button>
+            </div>
+
+            <!-- VIEW: SAMPLES -->
+            <div id="view-samples" class="view">
+                <div class="view-heading">
+                    <h2>Audio Samples</h2>
+                    <span id="sample-count" class="card-meta"></span>
+                </div>
+                <input
+                    type="text"
+                    id="sample-search-bar"
+                    placeholder="Search samples by song or artist..."
+                    oninput="renderSamples()"
+                />
+                <div id="sample-grid" class="grid"></div>
             </div>
 
             <!-- VIEW: LIBRARY -->
@@ -596,6 +663,62 @@
             let tempAudioBase64 = null,
                 tempAudioName = null;
 
+            const defaultSettings = {
+                theme: "system",
+                scrollSpeed: 30,
+                metronomeEnabled: true,
+            };
+
+            function normalizeState(savedState) {
+                const fallbackSetlist = {
+                    id: "default",
+                    name: "My First Setlist",
+                    songIds: [],
+                };
+                const normalized = savedState && typeof savedState === "object"
+                    ? savedState
+                    : {};
+                normalized.songs = (Array.isArray(normalized.songs)
+                    ? normalized.songs
+                    : [])
+                    .filter((song) => song && typeof song === "object")
+                    .map((song, index) => ({
+                        ...song,
+                        id: String(song.id || `legacy-song-${index}`),
+                        title: String(song.title || "Untitled song"),
+                        band: String(song.band || ""),
+                        tune: String(song.tune || ""),
+                        time: String(song.time || ""),
+                        bpm: song.bpm || "",
+                        lyrics: String(song.lyrics || ""),
+                        audioBase64: typeof song.audioBase64 === "string" ? song.audioBase64 : null,
+                        audioName: typeof song.audioName === "string" ? song.audioName : null,
+                    }));
+                const validSongIds = new Set(normalized.songs.map((song) => song.id));
+                normalized.setlists = (Array.isArray(normalized.setlists) && normalized.setlists.length
+                    ? normalized.setlists
+                    : [fallbackSetlist])
+                    .filter((setlist) => setlist && typeof setlist === "object")
+                    .map((setlist, index) => ({
+                        ...setlist,
+                        id: String(setlist.id || `legacy-setlist-${index}`),
+                        name: String(setlist.name || "Untitled setlist"),
+                        songIds: (Array.isArray(setlist.songIds) ? setlist.songIds : [])
+                            .map(String)
+                            .filter((id) => validSongIds.has(id)),
+                    }));
+                if (!normalized.setlists.length) normalized.setlists = [fallbackSetlist];
+                normalized.activeSetlistId = String(normalized.activeSetlistId || "");
+                if (!normalized.setlists.some((setlist) => setlist.id === normalized.activeSetlistId)) {
+                    normalized.activeSetlistId = normalized.setlists[0].id;
+                }
+                normalized.settings = {
+                    ...defaultSettings,
+                    ...(normalized.settings || {}),
+                };
+                return normalized;
+            }
+
             // ==========================================
             // INDEXED-DB STORAGE ENGINE
             // ==========================================
@@ -650,15 +773,7 @@
                     });
 
                     if (savedState) {
-                        state = savedState;
-                        // Safety check for new settings object
-                        if (!state.settings) {
-                            state.settings = {
-                                theme: "system",
-                                scrollSpeed: 30,
-                                metronomeEnabled: true,
-                            };
-                        }
+                        state = normalizeState(savedState);
                     } else {
                         // MIGRATION: If DB is empty, check old localStorage
                         const oldLocal = localStorage.getItem("GigmasterState");
@@ -666,26 +781,13 @@
                             console.log(
                                 "Migrating data from localStorage to IndexedDB...",
                             );
-                            state = JSON.parse(oldLocal);
+                            state = normalizeState(JSON.parse(oldLocal));
                             await saveData(); // Save it into IndexedDB immediately
                         }
                     }
                     applyTheme(state.settings.theme);
-
-                    // Safety check for setlists
-                    if (!state.setlists || state.setlists.length === 0) {
-                        state.setlists = [
-                            {
-                                id: "default",
-                                name: "My First Setlist",
-                                songIds: [],
-                            },
-                        ];
-                        state.activeSetlistId = "default";
-                    }
-
-                    applyTheme(state.theme);
                     renderLibrary();
+                    renderSamples();
                     updateSetlistDropdown();
                     renderSetlistSource();
                     renderActiveSetlist();
@@ -706,11 +808,10 @@
                 window.scrollTo(0, 0);
                 stopAutoScroll();
                 stopMetronome();
-                const p = document.getElementById("audio-player");
-                if (p) {
-                    p.pause();
-                    p.currentTime = 0;
-                }
+                document.querySelectorAll("audio").forEach((player) => {
+                    player.pause();
+                    player.currentTime = 0;
+                });
             }
 
             function goBack() {
@@ -718,8 +819,8 @@
             }
 
             function toggleTheme() {
-                state.theme = state.theme === "dark" ? "light" : "dark";
-                applyTheme(state.theme);
+                state.settings.theme = state.settings.theme === "dark" ? "light" : "dark";
+                applyTheme(state.settings.theme);
                 saveData();
             }
 
@@ -750,23 +851,79 @@
                 const search = document
                     .getElementById("search-bar")
                     .value.toLowerCase();
-                state.songs
+                const songs = state.songs
                     .filter(
                         (s) =>
                             s.title.toLowerCase().includes(search) ||
                             (s.band && s.band.toLowerCase().includes(search)),
-                    )
-                    .forEach((song) => {
+                    );
+                if (!songs.length) {
+                    renderEmptyState(
+                        grid,
+                        search ? "No songs match your search." : "No songs yet. Add your first song to get started.",
+                    );
+                    return;
+                }
+                songs.forEach((song) => {
                         const card = document.createElement("div");
                         card.className = "card";
                         card.onclick = () => {
                             isPlayingSetlist = false;
                             viewSong(song.id);
                         };
-                        card.innerHTML = `<h3>${song.title}${song.audioBase64 ? " 🎵" : ""}</h3>
-                            <div class="card-meta">${song.band || "Artist"} • Tune: ${song.tune || "N/A"} • ${song.bpm || "?"} BPM</div>`;
+                        const title = document.createElement("h3");
+                        title.textContent = `${song.title}${song.audioBase64 ? " 🎵" : ""}`;
+                        const meta = document.createElement("div");
+                        meta.className = "card-meta";
+                        meta.textContent = `${song.band || "Artist"} • Tune: ${song.tune || "N/A"} • ${song.bpm || "?"} BPM`;
+                        card.append(title, meta);
                         grid.appendChild(card);
                     });
+            }
+
+            function renderEmptyState(container, message) {
+                const empty = document.createElement("p");
+                empty.className = "empty-state";
+                empty.textContent = message;
+                container.appendChild(empty);
+            }
+
+            function renderSamples() {
+                const grid = document.getElementById("sample-grid");
+                const count = document.getElementById("sample-count");
+                if (!grid || !count) return;
+                grid.innerHTML = "";
+                const search = document
+                    .getElementById("sample-search-bar")
+                    .value.toLowerCase();
+                const samples = state.songs.filter((song) =>
+                    song.audioBase64 &&
+                    (song.title.toLowerCase().includes(search) ||
+                        (song.band || "").toLowerCase().includes(search)),
+                );
+                count.textContent = `${samples.length} sample${samples.length === 1 ? "" : "s"}`;
+                if (!samples.length) {
+                    renderEmptyState(
+                        grid,
+                        search ? "No samples match your search." : "No audio samples have been added yet.",
+                    );
+                    return;
+                }
+                samples.forEach((song) => {
+                    const card = document.createElement("article");
+                    card.className = "card sample-card";
+                    const title = document.createElement("h3");
+                    title.textContent = song.title;
+                    const meta = document.createElement("div");
+                    meta.className = "card-meta";
+                    meta.textContent = `${song.band || "Artist"} • ${song.audioName || "Audio sample"}`;
+                    const audio = document.createElement("audio");
+                    audio.controls = true;
+                    audio.preload = "metadata";
+                    audio.src = song.audioBase64;
+                    card.append(title, meta, audio);
+                    grid.appendChild(card);
+                });
             }
 
             document
@@ -808,6 +965,8 @@
                 clearAudioSelection();
                 if (songId) {
                     const s = state.songs.find((x) => x.id === songId);
+                    if (!s) return closeModal();
+                    document.getElementById("modal-title").textContent = "Edit Song";
                     document.getElementById("song-id").value = s.id;
                     document.getElementById("song-title").value = s.title;
                     document.getElementById("song-band").value = s.band || "";
@@ -826,9 +985,13 @@
                         ).style.display = "block";
                     }
                 } else {
+                    document.getElementById("modal-title").textContent = "Add New Song";
                     document.getElementById("song-id").value = "";
                     document.getElementById("song-title").value = "";
                     document.getElementById("song-band").value = "";
+                    document.getElementById("song-tune").value = "";
+                    document.getElementById("song-time").value = "";
+                    document.getElementById("song-bpm").value = "";
                     document.getElementById("song-lyrics").value = "";
                 }
             }
@@ -857,6 +1020,7 @@
                 idx > -1 ? (state.songs[idx] = song) : state.songs.push(song);
                 saveData();
                 renderLibrary();
+                renderSamples();
                 renderSetlistSource();
                 renderActiveSetlist();
                 closeModal();
@@ -878,6 +1042,7 @@
                 );
                 saveData();
                 renderLibrary();
+                renderSamples();
                 renderSetlistSource();
                 renderActiveSetlist();
                 closeModal();
@@ -1025,7 +1190,13 @@
                     li.draggable = true;
                     li.ondragstart = (e) =>
                         e.dataTransfer.setData("text", s.id);
-                    li.innerHTML = `<span>${s.title}</span> <button onclick="addSongToSetlist('${s.id}')">+</button>`;
+                    const title = document.createElement("span");
+                    title.textContent = s.title;
+                    const addButton = document.createElement("button");
+                    addButton.textContent = "+";
+                    addButton.setAttribute("aria-label", `Add ${s.title} to setlist`);
+                    addButton.onclick = () => addSongToSetlist(s.id);
+                    li.append(title, addButton);
                     src.appendChild(li);
                 });
             }
@@ -1039,8 +1210,27 @@
                     if (s) {
                         const li = document.createElement("li");
                         li.className = "song-list-item";
-                        li.innerHTML = `<span onclick="isPlayingSetlist=true; currentPlayingIndex=${idx}; viewSong('${id}')">${idx + 1}. ${s.title}</span>
-                                    <div><button onclick="moveInSetlist(${idx},-1)">▲</button><button onclick="moveInSetlist(${idx},1)">▼</button><button onclick="removeFromSetlist(${idx})">✖</button></div>`;
+                        const title = document.createElement("span");
+                        title.textContent = `${idx + 1}. ${s.title}`;
+                        title.className = "draggable";
+                        title.onclick = () => {
+                            isPlayingSetlist = true;
+                            currentPlayingIndex = idx;
+                            viewSong(id);
+                        };
+                        const controls = document.createElement("div");
+                        [
+                            ["▲", () => moveInSetlist(idx, -1), "Move song up"],
+                            ["▼", () => moveInSetlist(idx, 1), "Move song down"],
+                            ["✖", () => removeFromSetlist(idx), "Remove song from setlist"],
+                        ].forEach(([label, action, description]) => {
+                            const button = document.createElement("button");
+                            button.textContent = label;
+                            button.onclick = action;
+                            button.setAttribute("aria-label", description);
+                            controls.appendChild(button);
+                        });
+                        li.append(title, controls);
                         target.appendChild(li);
                     }
                 });
@@ -1143,6 +1333,7 @@
                 a.href = url;
                 a.download = "gigmaster-backup.json";
                 a.click();
+                setTimeout(() => URL.revokeObjectURL(url), 0);
             }
 
             function importData(e) {
@@ -1150,13 +1341,37 @@
                 if (!f) return;
                 const r = new FileReader();
                 r.onload = (ev) => {
-                    state = JSON.parse(ev.target.result);
-                    saveData();
-                    loadData();
-                    alert("Imported!");
+                    try {
+                        const imported = JSON.parse(ev.target.result);
+                        if (!imported || typeof imported !== "object" || Array.isArray(imported)) {
+                            throw new Error("The file does not contain a Gigmaster backup.");
+                        }
+                        state = normalizeState(imported);
+                        saveData();
+                        applyTheme(state.settings.theme);
+                        renderLibrary();
+                        renderSamples();
+                        updateSetlistDropdown();
+                        renderSetlistSource();
+                        renderActiveSetlist();
+                        alert("Backup imported.");
+                    } catch (err) {
+                        console.error("Failed to import backup:", err);
+                        alert("Couldn't import that file. Please choose a valid Gigmaster JSON backup.");
+                    } finally {
+                        e.target.value = "";
+                    }
                 };
+                r.onerror = () => alert("Couldn't read that file.");
                 r.readAsText(f);
             }
+
+            document.addEventListener("play", (event) => {
+                if (event.target.tagName !== "AUDIO") return;
+                document.querySelectorAll("audio").forEach((player) => {
+                    if (player !== event.target) player.pause();
+                });
+            }, true);
 
             // --- SETTINGS FUNCTIONS ---
             function openSettings() {
