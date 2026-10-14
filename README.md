@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="logo.svg" alt="Gigmaster Logo" width="120" />
+  <img src="gigmaster-logo.png" alt="Gigmaster Logo" width="120" />
   <h1>Gigmaster</h1>
   <p><strong>A simple, self-hosted lyrics library without dependenvies.</strong></p>
 
