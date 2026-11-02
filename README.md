@@ -10,7 +10,7 @@
 
 ## Overview
 
-**Gigmaster** is a lightweight, responsive web application designed to manage and display lyrics during gigs or rehearsals. It is built to be self-hosted and uses a simple flat-file structure. My goal was to make it simple and runnable on every modern Browser. No external frameworks are used, just pure HTML, CSS and javascript.
+**Gigmaster** is a lightweight, responsive web application designed to manage and display lyrics during gigs or rehearsals. It is built to be self-hosted and uses a flat-file structure. My goal was to make it simple and runnable on every modern Browser so no external frameworks are used, just pure HTML, CSS and javascript.
 
 ### Features
 * **Card Grid Layout:** Easy touch navigation for song selection.
@@ -27,7 +27,7 @@
 
 ## Usage
 
-Right-click the index.html file and open with a Browser. Everything loads instantly.
+Open the index.html file with a Browser. Everything loads instantly.
 
 If you want to host it with Nginx, Apache or something else, modify the docker-compose.yml, then
 1.  run:
@@ -39,13 +39,13 @@ If you want to host it with Nginx, Apache or something else, modify the docker-c
 
 ## Adding Songs
 
-You can drag and drop songs via the **"Add Song"** button in the **Library** tab, or by importing from the JSON.
+Songs can be added from the header or by importing from a JSON file.
 
 <img src="screenshots/add-song-ui.PNG" alt="main-page-light" width="200"/>
 
 ## Adding Setlists
 
-There is a default Setlist that can be edited. New ones can be added and also removed. The "Play Setlist" feature displays Songs in order and allows switching to the previous/next one.
+There is a default Setlist that can be edited. New ones can be added and removed. The "Play Setlist" feature displays Songs in order and allows switching to the previous/next one. Drag and drop Songs to add them faster.
 
 <img src="screenshots/setlist-ui.PNG" alt="main-page-light" width="600"/>
 
@@ -55,7 +55,7 @@ There is a default Setlist that can be edited. New ones can be added and also re
 
 Loading audio files as backing tracks is also supported. They are stored as base64 "Text" in the DB and JSON's. Your browser converts them back to audio in real time.
 
-Use the **Samples** tab to quickly audition attached audio without opening the full lyrics view. Starting a sample automatically pauses any other active audio player.
+Use the **Samples** tab to listen to attatched audio without opening the full lyrics view. Starting a sample automatically pauses any other active audio player.
 
 ---
 
